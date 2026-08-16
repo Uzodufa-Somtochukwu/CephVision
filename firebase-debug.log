@@ -1,0 +1,335 @@
+[debug] [2026-08-16T20:15:51.556Z] ----------------------------------------------------------------------
+[debug] [2026-08-16T20:15:51.561Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\DELL LATITUDE\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2026-08-16T20:15:51.561Z] CLI Version:   15.27.0
+[debug] [2026-08-16T20:15:51.561Z] Platform:      win32
+[debug] [2026-08-16T20:15:51.561Z] Node Version:  v24.18.0
+[debug] [2026-08-16T20:15:51.562Z] Detected Agent: unknown
+[debug] [2026-08-16T20:15:51.562Z] Time:          Sun Aug 16 2026 21:15:51 GMT+0100 (West Africa Time)
+[debug] [2026-08-16T20:15:51.562Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-08-16T20:15:54.010Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-16T20:15:54.010Z] > authorizing via signed-in user (somtouzodufa@gmail.com)
+[debug] [2026-08-16T20:15:54.010Z] [iam] checking project cephvision for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2026-08-16T20:15:54.028Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:15:54.029Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:15:54.030Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions [none]
+[debug] [2026-08-16T20:15:54.030Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions  x-goog-user-project=cephvision
+[debug] [2026-08-16T20:15:54.030Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2026-08-16T20:15:55.635Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions 200
+[debug] [2026-08-16T20:15:55.636Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2026-08-16T20:15:55.636Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:15:55.637Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:15:55.637Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/cephvision@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-08-16T20:15:55.637Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/cephvision@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-08-16T20:15:57.054Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/cephvision@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2026-08-16T20:15:57.055Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/cephvision@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'cephvision'...
+[info] 
+[info] i  deploying storage, firestore, functions, apphosting 
+[info] Running command: npm --prefix "$RESOURCE_DIR" run build
+[info] +  functions: Finished running predeploy script. 
+[info] i  storage: ensuring required API firebasestorage.googleapis.com is enabled... 
+[debug] [2026-08-16T20:16:04.195Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:04.195Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:04.195Z] >>> [apiv2][query] GET https://firebasestorage.googleapis.com/v1alpha/projects/cephvision/defaultBucket [none]
+[debug] [2026-08-16T20:16:07.358Z] <<< [apiv2][status] GET https://firebasestorage.googleapis.com/v1alpha/projects/cephvision/defaultBucket 200
+[debug] [2026-08-16T20:16:07.358Z] <<< [apiv2][body] GET https://firebasestorage.googleapis.com/v1alpha/projects/cephvision/defaultBucket {"name":"projects/cephvision/defaultBucket","location":"US-EAST1","bucket":{"name":"projects/cephvision/buckets/cephvision.firebasestorage.app"},"storageClass":"REGIONAL"}
+[info] i  firebase.storage: checking storage.rules for compilation errors... 
+[debug] [2026-08-16T20:16:07.360Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:07.360Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:07.361Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test [none]
+[debug] [2026-08-16T20:16:07.361Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test [omitted]
+[debug] [2026-08-16T20:16:09.327Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test 200
+[debug] [2026-08-16T20:16:09.327Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test {}
+[info] +  firebase.storage: rules file storage.rules compiled successfully 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-08-16T20:16:09.331Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:09.331Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:09.331Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) [none]
+[debug] [2026-08-16T20:16:10.062Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) 200
+[debug] [2026-08-16T20:16:10.062Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) {"name":"projects/cephvision/databases/(default)","uid":"42af5024-d873-422b-931d-27e1122e943c","createTime":"2026-08-16T20:11:11.405857Z","updateTime":"2026-08-16T20:11:11.405857Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-16T20:11:11.405857Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IJHRkMz7pZYDMPKWr9T6pZYD"}
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-08-16T20:16:10.065Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:10.065Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:10.065Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test [none]
+[debug] [2026-08-16T20:16:10.065Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test [omitted]
+[debug] [2026-08-16T20:16:10.493Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test 200
+[debug] [2026-08-16T20:16:10.493Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/cephvision:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-08-16T20:16:10.496Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:10.496Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:10.496Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/cephvision [none]
+[debug] [2026-08-16T20:16:12.030Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/cephvision 200
+[debug] [2026-08-16T20:16:12.030Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/cephvision {"projectNumber":"533966520170","projectId":"cephvision","lifecycleState":"ACTIVE","name":"Cephvision","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2026-08-16T17:18:17.930Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2026-08-16T20:16:12.034Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:12.034Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:12.034Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/cephvision/adminSdkConfig [none]
+[debug] [2026-08-16T20:16:13.124Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/cephvision/adminSdkConfig 200
+[debug] [2026-08-16T20:16:13.124Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/cephvision/adminSdkConfig {"projectId":"cephvision","storageBucket":"cephvision.firebasestorage.app"}
+[debug] [2026-08-16T20:16:13.128Z] Validating nodejs source
+[debug] [2026-08-16T20:16:15.674Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^6.0.0"
+  },
+  "private": true
+}
+[debug] [2026-08-16T20:16:15.674Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2026-08-16T20:16:15.677Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-08-16T20:16:15.690Z] Found firebase-functions binary at 'C:\Users\DELL LATITUDE\projects\cephvision\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8635
+
+[debug] [2026-08-16T20:16:17.362Z] Got response from /__/functions.yaml {"endpoints":{},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-08-16T20:16:20.427Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:20.427Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:20.427Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/cephvision/locations/-/functions [none]
+[debug] [2026-08-16T20:16:21.566Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/cephvision/locations/-/functions 200
+[debug] [2026-08-16T20:16:21.566Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/cephvision/locations/-/functions {}
+[debug] [2026-08-16T20:16:21.566Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:21.566Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:21.566Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/cephvision/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2026-08-16T20:16:22.640Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/cephvision/locations/-/functions 200
+[debug] [2026-08-16T20:16:22.641Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/cephvision/locations/-/functions {}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2026-08-16T20:16:22.643Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-16T20:16:22.643Z] > authorizing via signed-in user (somtouzodufa@gmail.com)
+[debug] [2026-08-16T20:16:22.644Z] [iam] checking project cephvision for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2026-08-16T20:16:22.644Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:22.644Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:22.644Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions [none]
+[debug] [2026-08-16T20:16:22.645Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions  x-goog-user-project=cephvision
+[debug] [2026-08-16T20:16:22.645Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-08-16T20:16:23.772Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions 200
+[debug] [2026-08-16T20:16:23.772Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-08-16T20:16:23.773Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:23.773Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:23.773Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/cephvision/instances pageSize=100&pageToken=
+[debug] [2026-08-16T20:16:25.101Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/cephvision/instances 200
+[debug] [2026-08-16T20:16:25.101Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/cephvision/instances {}
+[debug] [2026-08-16T20:16:25.103Z] Attempting to merge .env secret bindings {} into declared secrets...)}
+[debug] [2026-08-16T20:16:25.111Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:25.111Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:25.111Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-08-16T20:16:25.111Z] >>> [apiv2][(partial)header] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com:testIamPermissions  x-goog-user-project=cephvision
+[debug] [2026-08-16T20:16:25.111Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-08-16T20:16:26.353Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com:testIamPermissions 200
+[debug] [2026-08-16T20:16:26.354Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts/firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-08-16T20:16:26.354Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:26.354Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:26.354Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts [none]
+[debug] [2026-08-16T20:16:26.354Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts {"accountId":"firebase-app-hosting-compute","serviceAccount":{"displayName":"Firebase App Hosting compute service account","description":"Default service account used to run builds and deploys for Firebase App Hosting"}}
+[debug] [2026-08-16T20:16:27.569Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts 409
+[debug] [2026-08-16T20:16:27.569Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/cephvision/serviceAccounts [omitted]
+[debug] [2026-08-16T20:16:27.570Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:27.571Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:27.571Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:getIamPolicy [none]
+[debug] [2026-08-16T20:16:28.062Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:getIamPolicy 200
+[debug] [2026-08-16T20:16:28.062Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:getIamPolicy {"version":1,"etag":"BwZZL6tTkz0=","bindings":[{"role":"roles/artifactregistry.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-artifactregistry.iam.gserviceaccount.com"]},{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:533966520170@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.serviceAgent","members":["serviceAccount:service-533966520170@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-533966520170@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/developerconnect.readTokenAccessor","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:533966520170-compute@developer.gserviceaccount.com","serviceAccount:533966520170@cloudservices.gserviceaccount.com","serviceAccount:cephvision@appspot.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com","serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.computeRunner","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebaseapphosting.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-533966520170@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:somtouzodufa@gmail.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-533966520170@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/storage.objectViewer","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]}]}
+[debug] [2026-08-16T20:16:28.063Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:28.063Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:28.063Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:setIamPolicy [none]
+[debug] [2026-08-16T20:16:28.063Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:setIamPolicy {"policy":{"version":1,"etag":"BwZZL6tTkz0=","bindings":[{"role":"roles/artifactregistry.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-artifactregistry.iam.gserviceaccount.com"]},{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:533966520170@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.serviceAgent","members":["serviceAccount:service-533966520170@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-533966520170@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/developerconnect.readTokenAccessor","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:533966520170-compute@developer.gserviceaccount.com","serviceAccount:533966520170@cloudservices.gserviceaccount.com","serviceAccount:cephvision@appspot.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com","serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.computeRunner","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebaseapphosting.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-533966520170@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:somtouzodufa@gmail.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-533966520170@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/storage.objectViewer","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]}]},"updateMask":"bindings"}
+[debug] [2026-08-16T20:16:29.302Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:setIamPolicy 200
+[debug] [2026-08-16T20:16:29.303Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/cephvision:setIamPolicy {"version":1,"etag":"BwZZL7qniX0=","bindings":[{"role":"roles/artifactregistry.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-artifactregistry.iam.gserviceaccount.com"]},{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:533966520170@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.serviceAgent","members":["serviceAccount:service-533966520170@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-533966520170@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/developerconnect.readTokenAccessor","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:533966520170-compute@developer.gserviceaccount.com","serviceAccount:533966520170@cloudservices.gserviceaccount.com","serviceAccount:cephvision@appspot.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com","serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.computeRunner","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]},{"role":"roles/firebaseapphosting.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebaseapphosting.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-533966520170@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-533966520170@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:somtouzodufa@gmail.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-533966520170@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@cephvision.iam.gserviceaccount.com"]},{"role":"roles/storage.objectViewer","members":["serviceAccount:firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com"]}]}
+[debug] [2026-08-16T20:16:29.304Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:29.304Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:29.304Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/-/backends 
+[debug] [2026-08-16T20:16:30.706Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/-/backends 200
+[debug] [2026-08-16T20:16:30.707Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/-/backends {"backends":[{"name":"projects/cephvision/locations/europe-west4/backends/cephbe","createTime":"2026-08-16T19:42:25.552623426Z","updateTime":"2026-08-16T20:14:32.570943Z","labels":{"deployment-tool":"cli-firebase"},"uri":"cephbe--cephvision.europe-west4.hosted.app","managedResources":[{"runService":{"service":"projects/533966520170/locations/europe-west4/services/cephbe"}}],"uid":"a88fb50a-3513-413a-9316-68664e6440e8","etag":"2y_13aHbXWtOi0Jdi3-nmLmHvyaL57-OW4Ig23LEfAg","reconciling":false,"servingLocality":"GLOBAL_ACCESS","serviceAccount":"firebase-app-hosting-compute@cephvision.iam.gserviceaccount.com","appId":"1:533966520170:web:ece71def2deef1853cef13","runtime":{"value":"nodejs"}}]}
+[info] i  apphosting: Found backend(s) cephbe, cephbe, cephbe 
+[debug] [2026-08-16T20:16:30.709Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:30.709Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:30.709Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases pageSize=10&pageToken=
+[debug] [2026-08-16T20:16:31.605Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases 200
+[debug] [2026-08-16T20:16:31.605Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases {"releases":[{"name":"projects/cephvision/releases/cloud.firestore","rulesetName":"projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319","createTime":"2026-08-16T20:12:08.387906Z","updateTime":"2026-08-16T20:12:08.387906Z"},{"name":"projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app","rulesetName":"projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22","createTime":"2026-08-16T19:43:44.803412Z","updateTime":"2026-08-16T20:12:06.902083Z"}]}
+[debug] [2026-08-16T20:16:31.623Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:31.623Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:31.623Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22 [none]
+[debug] [2026-08-16T20:16:32.519Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22 200
+[debug] [2026-08-16T20:16:32.520Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22 [omitted]
+[info] i  storage: latest version of storage.rules already up to date, skipping upload... 
+[debug] [2026-08-16T20:16:32.522Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:32.522Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:32.522Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases pageSize=10&pageToken=
+[debug] [2026-08-16T20:16:33.285Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases 200
+[debug] [2026-08-16T20:16:33.286Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/cephvision/releases {"releases":[{"name":"projects/cephvision/releases/cloud.firestore","rulesetName":"projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319","createTime":"2026-08-16T20:12:08.387906Z","updateTime":"2026-08-16T20:12:08.387906Z"},{"name":"projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app","rulesetName":"projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22","createTime":"2026-08-16T19:43:44.803412Z","updateTime":"2026-08-16T20:12:06.902083Z"}]}
+[debug] [2026-08-16T20:16:33.286Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:33.286Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:33.286Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319 [none]
+[debug] [2026-08-16T20:16:34.136Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319 200
+[debug] [2026-08-16T20:16:34.136Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319 [omitted]
+[info] i  firestore: latest version of firestore.rules already up to date, skipping upload... 
+[info] i  firestore: deploying indexes... 
+[debug] [2026-08-16T20:16:34.138Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:34.138Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:34.138Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/indexes [none]
+[debug] [2026-08-16T20:16:34.998Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/indexes 200
+[debug] [2026-08-16T20:16:34.999Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/indexes {}
+[debug] [2026-08-16T20:16:34.999Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:34.999Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:35.000Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* [none]
+[debug] [2026-08-16T20:16:35.249Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* 200
+[debug] [2026-08-16T20:16:35.250Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default)/collectionGroups/-/fields?filter=indexConfig.usesAncestorConfig=false OR ttlConfig:* {"fields":[{"name":"projects/cephvision/databases/(default)/collectionGroups/__default__/fields/*","indexConfig":{"indexes":[{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"ASCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","order":"DESCENDING"}],"state":"READY"},{"queryScope":"COLLECTION","fields":[{"fieldPath":"*","arrayConfig":"CONTAINS"}],"state":"READY"}]}}]}
+[debug] [2026-08-16T20:16:35.250Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:35.250Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:35.251Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) [none]
+[debug] [2026-08-16T20:16:35.447Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) 200
+[debug] [2026-08-16T20:16:35.447Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/cephvision/databases/(default) {"name":"projects/cephvision/databases/(default)","uid":"42af5024-d873-422b-931d-27e1122e943c","createTime":"2026-08-16T20:11:11.405857Z","updateTime":"2026-08-16T20:11:11.405857Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-08-16T20:11:11.405857Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IPCjnNj7pZYDMPKWr9T6pZYD"}
+[info] +  firestore: deployed indexes in firestore.indexes.json successfully for (default) database 
+[debug] [2026-08-16T20:16:35.449Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:35.449Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:35.449Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/cephvision/billingInfo [none]
+[debug] [2026-08-16T20:16:35.449Z] >>> [apiv2][(partial)header] GET https://cloudbilling.googleapis.com/v1/projects/cephvision/billingInfo  x-goog-user-project=cephvision
+[debug] [2026-08-16T20:16:36.175Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/cephvision/billingInfo 200
+[debug] [2026-08-16T20:16:36.175Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/cephvision/billingInfo {"name":"projects/cephvision/billingInfo","projectId":"cephvision","billingAccountName":"billingAccounts/015E44-D537AB-E7349B","billingEnabled":true}
+[debug] [2026-08-16T20:16:36.177Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:36.177Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:36.177Z] >>> [apiv2][query] GET https://storage.googleapis.com/storage/v1/b?project=cephvision 
+[debug] [2026-08-16T20:16:37.612Z] <<< [apiv2][status] GET https://storage.googleapis.com/storage/v1/b?project=cephvision 200
+[debug] [2026-08-16T20:16:37.612Z] <<< [apiv2][body] GET https://storage.googleapis.com/storage/v1/b?project=cephvision {"kind":"storage#buckets","items":[{"kind":"storage#bucket","selfLink":"https://www.googleapis.com/storage/v1/b/cephvision.firebasestorage.app","id":"cephvision.firebasestorage.app","name":"cephvision.firebasestorage.app","projectNumber":"533966520170","generation":"1786909414024834299","metageneration":"1","location":"US-EAST1","storageClass":"REGIONAL","etag":"CAE=","timeCreated":"2026-08-16T19:43:34.102Z","updated":"2026-08-16T19:43:34.102Z","softDeletePolicy":{"retentionDurationSeconds":"604800","effectiveTime":"2026-08-16T19:43:34.102Z"},"iamConfiguration":{"bucketPolicyOnly":{"enabled":false},"uniformBucketLevelAccess":{"enabled":false},"publicAccessPrevention":"inherited"},"locationType":"region","satisfiesPZI":true},{"kind":"storage#bucket","selfLink":"https://www.googleapis.com/storage/v1/b/firebaseapphosting-sources-533966520170-europe-west4","id":"firebaseapphosting-sources-533966520170-europe-west4","name":"firebaseapphosting-sources-533966520170-europe-west4","projectNumber":"533966520170","generation":"1786911124168961922","metageneration":"1","location":"EUROPE-WEST4","storageClass":"STANDARD","etag":"CAE=","timeCreated":"2026-08-16T20:12:04.602Z","updated":"2026-08-16T20:12:04.602Z","lifecycle":{"rule":[{"action":{"type":"Delete"},"condition":{"age":30}}]},"labels":{"apphosting-source-europe-west4":"true"},"softDeletePolicy":{"retentionDurationSeconds":"604800","effectiveTime":"2026-08-16T20:12:04.602Z"},"iamConfiguration":{"bucketPolicyOnly":{"enabled":false},"uniformBucketLevelAccess":{"enabled":false},"publicAccessPrevention":"inherited"},"locationType":"region","satisfiesPZI":true}]}
+[info] i  apphosting: Zipped source for backend cephbe 
+[info] i  apphosting: Uploading source for backend cephbe... 
+[debug] [2026-08-16T20:16:37.728Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:37.728Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:37.729Z] >>> [apiv2][query] PUT https://storage.googleapis.com/firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip [none]
+[debug] [2026-08-16T20:16:37.729Z] >>> [apiv2][body] PUT https://storage.googleapis.com/firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip [stream]
+[debug] [2026-08-16T20:16:38.827Z] <<< [apiv2][status] PUT https://storage.googleapis.com/firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip 200
+[debug] [2026-08-16T20:16:38.827Z] <<< [apiv2][body] PUT https://storage.googleapis.com/firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip undefined
+[info] i  apphosting: Uploaded at gs://firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip 
+[debug] [2026-08-16T20:16:38.828Z] [rules] releasing firebase.storage/cephvision.firebasestorage.app with ruleset projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22
+[debug] [2026-08-16T20:16:38.829Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:38.829Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:38.829Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app [none]
+[debug] [2026-08-16T20:16:38.829Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app {"release":{"name":"projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app","rulesetName":"projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22"}}
+[debug] [2026-08-16T20:16:40.878Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app 200
+[debug] [2026-08-16T20:16:40.879Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app {"name":"projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app","rulesetName":"projects/cephvision/rulesets/6bc37df7-bdfa-454c-985b-8052f248fd22","createTime":"2026-08-16T19:43:44.803412Z","updateTime":"2026-08-16T20:16:41.740340Z"}
+[debug] [2026-08-16T20:16:40.879Z] [rules] updated release projects/cephvision/releases/firebase.storage/cephvision.firebasestorage.app
+[info] +  storage: released rules storage.rules to firebase.storage 
+[debug] [2026-08-16T20:16:40.880Z] [rules] releasing cloud.firestore with ruleset projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319
+[debug] [2026-08-16T20:16:40.880Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:40.880Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:40.880Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/cloud.firestore [none]
+[debug] [2026-08-16T20:16:40.880Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/cloud.firestore {"release":{"name":"projects/cephvision/releases/cloud.firestore","rulesetName":"projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319"}}
+[debug] [2026-08-16T20:16:41.990Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/cloud.firestore 200
+[debug] [2026-08-16T20:16:41.990Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/cephvision/releases/cloud.firestore {"name":"projects/cephvision/releases/cloud.firestore","rulesetName":"projects/cephvision/rulesets/06679c90-2d6d-4146-aecf-208964d86319","createTime":"2026-08-16T20:12:08.387906Z","updateTime":"2026-08-16T20:16:42.749784Z"}
+[debug] [2026-08-16T20:16:41.990Z] [rules] updated release projects/cephvision/releases/cloud.firestore
+[info] +  firestore: released rules firestore.rules to cloud.firestore 
+[debug] [2026-08-16T20:16:41.998Z] Total Function Deployment time: 0
+[debug] [2026-08-16T20:16:41.998Z] 0 Functions Deployed
+[debug] [2026-08-16T20:16:41.998Z] 0 Functions Errored
+[debug] [2026-08-16T20:16:41.998Z] 0 Function Deployments Aborted
+[debug] [2026-08-16T20:16:41.998Z] Average Function Deployment time: NaN
+[debug] [2026-08-16T20:16:42.376Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:42.376Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:42.376Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:42.376Z] Checked if tokens are valid: true, expires at: 1786914644087
+[info] i  apphosting: You may also track the rollout(s) at:
+	https://console.firebase.google.com/project/cephvision/apphosting 
+[debug] [2026-08-16T20:16:42.384Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts 
+[debug] [2026-08-16T20:16:42.386Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds 
+[debug] [2026-08-16T20:16:42.805Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts 200
+[debug] [2026-08-16T20:16:42.805Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts {"rollouts":[{"name":"projects/cephvision/locations/europe-west4/backends/cephbe/rollouts/build-2026-08-16-001","createTime":"2026-08-16T20:12:10.798456145Z","updateTime":"2026-08-16T20:14:32.979971Z","state":"SUCCEEDED","build":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-001","labels":{"deployment-tool":"cli-firebase"},"uid":"c56818e0-3922-4055-b310-5ab0c02a8111","etag":"SyHHy0FiYekD9w7Dwa_bNNO2cnnm_-es-cNevX-Pm2M","reconciling":false}]}
+[debug] [2026-08-16T20:16:42.974Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds 200
+[debug] [2026-08-16T20:16:42.974Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds {"builds":[{"name":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-001","state":"READY","image":"europe-west4-docker.pkg.dev/cephvision/firebaseapphosting-images/cephbe:build-2026-08-16-001","config":{"runConfig":{},"env":[{"variable":"FIREBASE_CONFIG","value":"{\"databaseURL\":\"\",\"projectId\":\"cephvision\",\"storageBucket\":\"cephvision.firebasestorage.app\"}","availability":["BUILD","RUNTIME"]},{"variable":"FIREBASE_WEBAPP_CONFIG","value":"{\"apiKey\":\"AIzaSyAiVY8Z95fkveRrCicE7qncDlzfQIfWeeo\",\"appId\":\"1:533966520170:web:ece71def2deef1853cef13\",\"authDomain\":\"cephvision.firebaseapp.com\",\"databaseURL\":\"\",\"messagingSenderId\":\"533966520170\",\"projectId\":\"cephvision\",\"storageBucket\":\"cephvision.firebasestorage.app\"}","availability":["BUILD"]},{"variable":"NG_TRUST_PROXY_HEADERS","value":"X-Forwarded-Host","availability":["RUNTIME"]},{"variable":"NG_ALLOWED_HOSTS","value":"cephbe-533966520170.europe-west4.run.app,cephbe--cephvision.europe-west4.hosted.app","availability":["RUNTIME"]}],"effectiveEnv":[{"variable":"FIREBASE_CONFIG","value":"{\"databaseURL\":\"\",\"projectId\":\"cephvision\",\"storageBucket\":\"cephvision.firebasestorage.app\"}","availability":["BUILD","RUNTIME"],"origin":"FIREBASE_SYSTEM"},{"variable":"FIREBASE_WEBAPP_CONFIG","value":"{\"apiKey\":\"AIzaSyAiVY8Z95fkveRrCicE7qncDlzfQIfWeeo\",\"appId\":\"1:533966520170:web:ece71def2deef1853cef13\",\"authDomain\":\"cephvision.firebaseapp.com\",\"databaseURL\":\"\",\"messagingSenderId\":\"533966520170\",\"projectId\":\"cephvision\",\"storageBucket\":\"cephvision.firebasestorage.app\"}","availability":["BUILD"],"origin":"FIREBASE_SYSTEM"},{"variable":"NG_TRUST_PROXY_HEADERS","value":"X-Forwarded-Host","availability":["RUNTIME"],"origin":"FIREBASE_SYSTEM"},{"variable":"NG_ALLOWED_HOSTS","value":"cephbe-533966520170.europe-west4.run.app,cephbe--cephvision.europe-west4.hosted.app","availability":["RUNTIME"],"origin":"FIREBASE_SYSTEM"}]},"source":{"archive":{"rootDirectory":"/","userStorageUri":"gs://firebaseapphosting-sources-533966520170-europe-west4/cephbe--5612-cJL2OzNynO0k-.zip"}},"buildLogsUri":"https://console.cloud.google.com/cloud-build/builds;region=europe-west4/0d1e9f28-c24e-44e3-b263-4921af9b6f11?project=533966520170","createTime":"2026-08-16T20:12:10.255877154Z","updateTime":"2026-08-16T20:14:32.415757Z","labels":{"deployment-tool":"cli-firebase"},"uid":"1f7cb0bd-a5f2-4e19-aa98-fcf17f243666","etag":"KOl8O4_87pJ_ym830V-jqyVFXQJgzt0xhgwngdOQRuE","reconciling":false}]}
+[debug] [2026-08-16T20:16:42.975Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:42.976Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:42.976Z] >>> [apiv2][query] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds buildId=build-2026-08-16-002
+[debug] [2026-08-16T20:16:42.976Z] >>> [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds {"source":{"archive":{"userStorageUri":"gs://firebaseapphosting-sources-533966520170-europe-west4/cephbe--22308-CZP8Sb3gdjUk-.zip","rootDirectory":"/"}},"labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-16T20:16:43.423Z] <<< [apiv2][status] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds 200
+[debug] [2026-08-16T20:16:43.423Z] <<< [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/builds {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:43.423Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.423Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.423Z] >>> [apiv2][query] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts rolloutId=build-2026-08-16-002&validateOnly=true
+[debug] [2026-08-16T20:16:43.424Z] >>> [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts {"build":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-16T20:16:43.628Z] <<< [apiv2][status] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts 200
+[debug] [2026-08-16T20:16:43.628Z] <<< [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts {"name":"","metadata":{},"done":true}
+[debug] [2026-08-16T20:16:43.628Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.628Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.628Z] >>> [apiv2][query] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts rolloutId=build-2026-08-16-002&validateOnly=false
+[debug] [2026-08-16T20:16:43.628Z] >>> [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts {"build":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-08-16T20:16:43.831Z] <<< [apiv2][status] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts 200
+[debug] [2026-08-16T20:16:43.832Z] <<< [apiv2][body] POST https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/backends/cephbe/rollouts {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404770-6592fbb86c513-3b584da9-69b24914","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.785505101Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/rollouts/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:43.833Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.833Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.834Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.834Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:43.834Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404770-6592fbb86c513-3b584da9-69b24914 [none]
+[debug] [2026-08-16T20:16:43.835Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:16:43.998Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404770-6592fbb86c513-3b584da9-69b24914 200
+[debug] [2026-08-16T20:16:43.998Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404770-6592fbb86c513-3b584da9-69b24914 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404770-6592fbb86c513-3b584da9-69b24914","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.785505101Z","endTime":"2026-08-16T20:16:44.807942190Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/rollouts/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":true,"response":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.Rollout","name":"projects/cephvision/locations/europe-west4/backends/cephbe/rollouts/build-2026-08-16-002","createTime":"2026-08-16T20:16:44.782269991Z","updateTime":"2026-08-16T20:16:44.805818Z","state":"QUEUED","build":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","labels":{"deployment-tool":"cli-firebase"},"uid":"006944ac-e67c-4220-9050-4b88beb9f27d","etag":"skRisE4zpsHyBKDTowr2uuKx8PLWB1BWfn7SsQp2zrI","reconciling":false}}
+[debug] [2026-08-16T20:16:44.095Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:16:44.095Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:44.609Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:16:44.610Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:44.610Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:44.610Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:16:44.959Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:16:44.959Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:45.964Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:16:45.965Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:45.966Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:45.966Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:16:46.188Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:16:46.188Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:48.189Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:16:48.190Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:48.190Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:48.190Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:16:48.355Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:16:48.355Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:16:52.355Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:16:52.355Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:52.355Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:16:52.355Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:16:53.285Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:16:53.285Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:17:01.287Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:17:01.288Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:01.288Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:01.288Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:17:01.869Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:17:01.869Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:17:11.872Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:17:11.873Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:11.873Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:11.873Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:17:12.631Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:17:12.631Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
+[debug] [2026-08-16T20:17:22.640Z] [create-cephvision-europe-west4-backend-cephbe-build-build-2026-08-16-002] Retrying task index 0
+[debug] [2026-08-16T20:17:22.640Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:22.640Z] Checked if tokens are valid: true, expires at: 1786914644087
+[debug] [2026-08-16T20:17:22.640Z] >>> [apiv2][query] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 [none]
+[debug] [2026-08-16T20:17:23.268Z] <<< [apiv2][status] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 200
+[debug] [2026-08-16T20:17:23.268Z] <<< [apiv2][body] GET https://firebaseapphosting.googleapis.com/v1beta/projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478 {"name":"projects/cephvision/locations/europe-west4/operations/operation-1786911404153-6592fbb7d5b0d-612ddce2-4c0e6478","metadata":{"@type":"type.googleapis.com/google.firebase.apphosting.v1beta.OperationMetadata","createTime":"2026-08-16T20:16:44.180086625Z","target":"projects/cephvision/locations/europe-west4/backends/cephbe/builds/build-2026-08-16-002","verb":"create","requestedCancellation":false,"apiVersion":"v1beta"},"done":false}
