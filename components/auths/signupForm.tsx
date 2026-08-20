@@ -111,9 +111,9 @@ const SignupForm = () => {
             />
           </section>
           <div className="flex flex-row justify-between text-base font-normal mt-3 mb-2  text-primary">
-            <Link href="/forgot-password">
+            {/* <Link href="/forgot-password">
               <h3 className="text-primary underline">Forgot password?</h3>
-            </Link>
+            </Link> */}
             <Link href="/login">
               <h3 className="text-primary underline">Login</h3>
             </Link>
