@@ -86,3 +86,44 @@ export interface PatientInfo {
   date: string;
   doctorName?: string;
 }
+
+export type EditableFindings = {
+  skeletal: string;
+  dental: string;
+  isConfirmed: boolean;
+};
+
+export type CephStudy = {
+  id: string;
+  patient: PatientInfo;
+
+  imageSrc: string | null;
+
+  imageDimensions: {
+    width: number;
+    height: number;
+  };
+
+  landmarks: PredictionObject[];
+
+  analysisData: CephAnalysisResult | null;
+
+  editableFindings: EditableFindings;
+
+  selectedMalocclusion: string;
+
+  customObjectives: string[];
+
+  clinicianNotes: string;
+
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ViewMode = "patients" | "analysis";
+
+export type AnalysisTab =
+  | "radiograph"
+  | "measurements"
+  | "findings"
+  | "treatment";
