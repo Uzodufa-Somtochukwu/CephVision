@@ -64,18 +64,19 @@ export default function App() {
   }, [studies, hydrated]);
 
   /*  NEW ANALYSIS */
+  const handleAddMoreAnalysisForPatient = (patientId:string = '') => {
+      const newStudy = createEmptyStudy(patientId);
+  }
 
-  const handleNewAnalysis = () => {
-    const newStudy = createEmptyStudy();
+  const handleNewAnalysis = (patientId:string = '') => {
+    const newStudy = createEmptyStudy(patientId);
 
     setCurrentStudy(newStudy);
     setViewMode("analysis");
     setSelectedPatientStudy(null);
   };
 
-  /* =====================================================
-     SAVE
-  ===================================================== */
+  /* SAVE */
 
   const handleSaveStudy = (
     updatedStudy: CephStudy
@@ -179,7 +180,7 @@ export default function App() {
           setSelectedPatientStudy(null)
         }
         onOpenStudy={handleOpenStudy}
-        onNewAnalysis={handleNewAnalysis}
+        onNewAnalysis={(patientId:string) => handleNewAnalysis(patientId)}
       />
     );
   }
@@ -213,7 +214,7 @@ export default function App() {
           setViewMode("patients");
         }}
         onDelete={handleDeleteStudy}
-        onNewAnalysis={handleNewAnalysis}
+        onNewAnalysis={ handleNewAnalysis}
       />
     );
   }

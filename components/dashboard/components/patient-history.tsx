@@ -14,7 +14,7 @@ export function PatientHistory({
   studies: CephStudy[];
   onBack: () => void;
   onOpenStudy: (study: CephStudy) => void;
-  onNewAnalysis: () => void;
+  onNewAnalysis: (val:string) => void | any;
 }) {
   const patientStudies = studies
     .filter(
@@ -26,6 +26,7 @@ export function PatientHistory({
         new Date(b.updatedAt).getTime() -
         new Date(a.updatedAt).getTime()
     );
+    const patientID = patientStudies[0].patient.id
 
   return (
     <div className="min-h-screen bg-[#f7faf8]">
@@ -39,10 +40,10 @@ export function PatientHistory({
             Patients
           </Button>
 
-          <Button onClick={onNewAnalysis}>
+          {/* <Button onClick={onNewAnalysis(patientID as string)}>
             <Plus className="h-4 w-4" />
             New Analysis
-          </Button>
+          </Button> */}
         </div>
       </header>
 

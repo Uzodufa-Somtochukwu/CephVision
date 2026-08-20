@@ -40,12 +40,12 @@ export function formatDateTime(value: string) {
   });
 }
 
-export function createEmptyPatient(): PatientInfo {
+export function createEmptyPatient(patientID:string): PatientInfo {
   return {
     name: "",
-    id: `PT-${new Date().getFullYear()}-${String(
+    id:  `${patientID.length >= 1 ? patientID : `PT-${new Date().getFullYear()}-${String(
       Math.floor(Math.random() * 9999)
-    ).padStart(4, "0")}`,
+    ).padStart(4, "0")}`}`,
     age: "",
     sex: "",
     date: new Date().toLocaleDateString(),
@@ -53,13 +53,13 @@ export function createEmptyPatient(): PatientInfo {
   };
 }
 
-export function createEmptyStudy(): CephStudy {
+export function createEmptyStudy(selectedPatientId:string = ''): CephStudy {
   const now = new Date().toISOString();
 
   return {
     id: createId(),
 
-    patient: createEmptyPatient(),
+    patient: createEmptyPatient(selectedPatientId),
 
     imageSrc: null,
 
