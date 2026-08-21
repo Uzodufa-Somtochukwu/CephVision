@@ -164,9 +164,8 @@ export function CephLandmarks({
             />
           )}
 
-          
-          
-           {porion && orbitale && 
+          {porion &&
+            orbitale &&
             (() => {
               const dx = porion.renderX - orbitale.renderX;
               const dy = porion.renderY - orbitale.renderY;
@@ -196,12 +195,11 @@ export function CephLandmarks({
                   x2={extendedX}
                   y2={extendedY}
                   stroke="#8b5cf6"
-              strokeWidth={1.5}
-              strokeDasharray="4 2"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
                 />
               );
             })()}
-
 
           {nasion && aPoint && (
             <line
@@ -256,8 +254,7 @@ export function CephLandmarks({
               );
             })()}
 
-
- {ans &&
+          {ans &&
             pns &&
             (() => {
               const dx = pns.renderX - ans.renderX;
@@ -283,13 +280,11 @@ export function CephLandmarks({
                   x2={extendedX}
                   y2={extendedY}
                   stroke="#eab308"
-              strokeWidth={1.5}
-              strokeDasharray="3 3"
+                  strokeWidth={1.5}
+                  strokeDasharray="3 3"
                 />
               );
             })()}
-          
-
 
           {l1Apex && l1Tip && (
             <line

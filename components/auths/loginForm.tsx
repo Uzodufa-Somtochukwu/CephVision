@@ -62,14 +62,14 @@ const LoginForm = () => {
           <section>
             <div className="flex flex-row gap-x-2 items-center -ml-2">
               <Image src={cephLoginImage} alt="logo"  className="rounded-full h-10 w-10"  />
-              <h2 className="text-primary font-bold text-2xl">
+              <h2 className="text-black font-bold text-2xl">
                 CephVision
               </h2>
             </div>
           </section>
 
           
-          <h1 className="text-xl font-bold mt-16 ">Welcome Back!</h1>
+          <h1 className="text-xl font-bold mt-16 text-black ">Welcome Back!</h1>
           <section className="mt-5">
             <TextInput
               value={values.email}
@@ -101,7 +101,7 @@ const LoginForm = () => {
               <h3 className="text-primary underline">Forgot password?</h3>
             </Link> */}
             <Link href="/signup">
-              <h3 className="text-primary underline">Signup</h3>
+              <h3 className="text-primary text-black underline">Signup</h3>
             </Link>
           </div>
           <div>
