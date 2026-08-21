@@ -17,48 +17,52 @@ export function CephLandmarks({
   showPlanes?: boolean;
   showLabels?: boolean;
 }) {
-  const [activeDragIndex, setActiveDragIndex] = useState<number | null>(
-    null
-  );
+  const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
 
   const rawKeypoints: Keypoint[] = landmarks[0]?.keypoints || [];
 
-  const keypointsList = rawKeypoints.map((kp) => ({
+  const extraKeypoints = rawKeypoints.map((kp) => ({
     ...kp,
     renderX: kp.x,
     renderY: kp.y,
   }));
+  const gonionPoints = extraKeypoints.find((i) => i.class === "gonion");
 
-  const getLM = (
-    possibleLabels: string[],
-    maxRelativeY?: number
-  ) => {
+  const keypointsList = [
+    ...extraKeypoints,
+    {
+      renderX: -10,
+      renderY: -10,
+      id: "ccee",
+      class: "xgonion",
+      x: -10,
+      y: -10,
+      confidence: 90,
+    },
+  ];
+
+  const getLM = (possibleLabels: string[], maxRelativeY?: number) => {
     const matches = keypointsList.filter((lm) =>
       possibleLabels.some(
         (label) =>
-          lm.class?.toLowerCase().trim() ===
-          label.toLowerCase().trim()
-      )
+          lm.class?.toLowerCase().trim() === label.toLowerCase().trim(),
+      ),
     );
 
     if (matches.length === 0) return undefined;
 
     if (maxRelativeY !== undefined) {
-      const upperMatches = matches.filter(
-        (m) => m.renderY <= maxRelativeY
-      );
+      const upperMatches = matches.filter((m) => m.renderY <= maxRelativeY);
 
       if (upperMatches.length > 0) {
         return upperMatches.reduce((prev, curr) =>
-          curr.renderY < prev.renderY ? curr : prev
+          curr.renderY < prev.renderY ? curr : prev,
         );
       }
     }
 
     return matches.reduce((prev, curr) =>
-      (curr.confidence || 0) > (prev.confidence || 0)
-        ? curr
-        : prev
+      (curr.confidence || 0) > (prev.confidence || 0) ? curr : prev,
     );
   };
 
@@ -68,18 +72,15 @@ export function CephLandmarks({
   const pns = getLM(["pns"]);
   const aPoint = getLM(["subspinale", "a_point", "a"]);
   const bPoint = getLM(["supramentale", "b_point", "b"]);
-  const menton = getLM(["menton", "me"]);
+  const menton = getLM(["mention", "me"]);
   const gonion = getLM(["gonion", "go"]);
-  const porion = getLM(["porion", "po"]);
+  const xgonion = getLM(["xgonion"]);
+  const porion = getLM(["ponion", "po"]);
   const orbitale = getLM(["orbitale", "or"]);
   const subnasale = getLM(["subnasale"]);
   const upperLip = getLM(["upper-lip", "upper_lip", "ls"]);
   const lowerLip = getLM(["lower-lip", "lower_lip", "li"]);
-  const softPog = getLM([
-    "soft-tissue-pogonion",
-    "soft_pogonion",
-    "pog_prime",
-  ]);
+  const softPog = getLM(["soft-tissue-pogonion", "soft_pogonion", "pog_prime"]);
 
   const u1Tip = getLM([
     "upper-incisor-tip",
@@ -102,33 +103,23 @@ export function CephLandmarks({
     "ia",
   ]);
 
-  const handleMouseDown = (
-    index: number,
-    e: React.MouseEvent
-  ) => {
+  const handleMouseDown = (index: number, e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveDragIndex(index);
   };
 
-  const handleMouseMove = (
-    e: React.MouseEvent<SVGSVGElement>
-  ) => {
-    if (
-      activeDragIndex === null ||
-      !onLandmarkChange
-    ) {
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (activeDragIndex === null || !onLandmarkChange) {
       return;
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
 
     const newRenderX =
-      ((e.clientX - rect.left) / rect.width) *
-      imageDimensions.width;
+      ((e.clientX - rect.left) / rect.width) * imageDimensions.width;
 
     const newRenderY =
-      ((e.clientY - rect.top) / rect.height) *
-      imageDimensions.height;
+      ((e.clientY - rect.top) / rect.height) * imageDimensions.height;
 
     const updatedKeypoints = [...rawKeypoints];
 
@@ -173,17 +164,44 @@ export function CephLandmarks({
             />
           )}
 
-          {porion && orbitale && (
-            <line
-              x1={porion.renderX}
-              y1={porion.renderY}
-              x2={orbitale.renderX}
-              y2={orbitale.renderY}
-              stroke="#8b5cf6"
+          
+          
+           {porion && orbitale && 
+            (() => {
+              const dx = porion.renderX - orbitale.renderX;
+              const dy = porion.renderY - orbitale.renderY;
+
+              // How far beyond pns you want the line to extend
+              const extension = 750;
+              const extensionA = -150;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+              // New endpoint beyond Gonion
+              const extendedX = porion.renderX + unitX * extension;
+              const extendedY = porion.renderY + unitY * extension;
+
+              // New endpoint beyond Orbitale
+              const extendedOX = orbitale.renderX + unitX * extensionA;
+              const extendedOY = orbitale.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={extendedOX}
+                  y1={extendedOY}
+                  x2={extendedX}
+                  y2={extendedY}
+                  stroke="#8b5cf6"
               strokeWidth={1.5}
               strokeDasharray="4 2"
-            />
-          )}
+                />
+              );
+            })()}
+
 
           {nasion && aPoint && (
             <line
@@ -207,28 +225,71 @@ export function CephLandmarks({
             />
           )}
 
-          {gonion && menton && (
-            <line
-              x1={gonion.renderX}
-              y1={gonion.renderY}
-              x2={menton.renderX}
-              y2={menton.renderY}
-              stroke="#22c55e"
-              strokeWidth={2}
-            />
-          )}
+          {gonion &&
+            menton &&
+            (() => {
+              const dx = gonion.renderX - menton.renderX;
+              const dy = gonion.renderY - menton.renderY;
 
-          {ans && pns && (
-            <line
-              x1={ans.renderX}
-              y1={ans.renderY}
-              x2={pns.renderX}
-              y2={pns.renderY}
-              stroke="#eab308"
+              // How far beyond Gonion you want the line to extend
+              const extension = 550;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+              // New endpoint beyond Gonion
+              const extendedX = gonion.renderX + unitX * extension;
+              const extendedY = gonion.renderY + unitY * extension;
+
+              return (
+                <line
+                  x1={menton.renderX}
+                  y1={menton.renderY}
+                  x2={extendedX}
+                  y2={extendedY}
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                />
+              );
+            })()}
+
+
+ {ans &&
+            pns &&
+            (() => {
+              const dx = pns.renderX - ans.renderX;
+              const dy = pns.renderY - ans.renderY;
+
+              // How far beyond pns you want the line to extend
+              const extension = 750;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+              // New endpoint beyond Gonion
+              const extendedX = pns.renderX + unitX * extension;
+              const extendedY = pns.renderY + unitY * extension;
+
+              return (
+                <line
+                  x1={ans.renderX}
+                  y1={ans.renderY}
+                  x2={extendedX}
+                  y2={extendedY}
+                  stroke="#eab308"
               strokeWidth={1.5}
               strokeDasharray="3 3"
-            />
-          )}
+                />
+              );
+            })()}
+          
+
 
           {l1Apex && l1Tip && (
             <line
@@ -241,21 +302,18 @@ export function CephLandmarks({
             />
           )}
 
-          {subnasale &&
-            upperLip &&
-            lowerLip &&
-            softPog && (
-              <path
-                d={`M ${subnasale.renderX} ${subnasale.renderY}
+          {subnasale && upperLip && lowerLip && softPog && (
+            <path
+              d={`M ${subnasale.renderX} ${subnasale.renderY}
                 Q ${upperLip.renderX} ${upperLip.renderY},
                 ${lowerLip.renderX} ${lowerLip.renderY}
                 T ${softPog.renderX} ${softPog.renderY}`}
-                fill="none"
-                stroke="#22c55e"
-                strokeWidth={2}
-                strokeDasharray="4 3"
-              />
-            )}
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth={2}
+              strokeDasharray="4 3"
+            />
+          )}
         </g>
       )}
 
@@ -263,9 +321,7 @@ export function CephLandmarks({
         <g
           key={`${lm.class}-${idx}`}
           transform={`translate(${lm.renderX}, ${lm.renderY})`}
-          onMouseDown={(e) =>
-            handleMouseDown(idx, e)
-          }
+          onMouseDown={(e) => handleMouseDown(idx, e)}
           className="group cursor-grab active:cursor-grabbing"
         >
           <circle
@@ -277,10 +333,7 @@ export function CephLandmarks({
             className="transition-all duration-150 group-hover:scale-150"
           />
 
-          <circle
-            r={2.5}
-            fill="#ffffff"
-          />
+          <circle r={2.5} fill="#ffffff" />
 
           {showLabels && (
             <text

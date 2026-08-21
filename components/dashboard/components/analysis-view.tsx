@@ -726,7 +726,7 @@ export function AnalysisView({
                   setActiveTab(tab.id)
                 }
                 className={`
-                  flex min-w-max flex-1 items-center justify-center gap-2
+                  flex cursor-pointer min-w-max flex-1 items-center justify-center gap-2
                   rounded-lg px-4 py-2.5
                   text-sm font-semibold
                   transition
@@ -1343,9 +1343,7 @@ export function AnalysisView({
                   },
                 ].map((item) => {
                   const active =
-                    selectedMalocclusion.startsWith(
-                      item.id
-                    );
+                    selectedMalocclusion.toLowerCase() === item?.id?.toLowerCase()
 
                   return (
                     <button
