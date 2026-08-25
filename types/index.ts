@@ -1,3 +1,14 @@
+type AnalysisMode =
+  | "steiner"
+  | "mcnamara"
+  | "jarabak"
+  | "tweed"
+  | "wits"
+  | "soft-tissue"
+  | "comprehensive";
+
+type LandmarkCategory = "hard-tissue" | "soft-tissue";
+
 export interface Keypoint {
   id?: string;
   class: string;

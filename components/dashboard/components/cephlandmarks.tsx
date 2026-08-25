@@ -26,8 +26,7 @@ export function CephLandmarks({
     renderX: kp.x,
     renderY: kp.y,
   }));
-  const gonionPoints = extraKeypoints.find((i) => i.class === "gonion");
-
+  
   const keypointsList = [
     ...extraKeypoints,
     {
