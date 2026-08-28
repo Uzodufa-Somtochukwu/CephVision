@@ -70,7 +70,6 @@ export default function App() {
 
   const handleNewAnalysis = (patientId:string = '') => {
     const newStudy = createEmptyStudy(patientId);
-
     setCurrentStudy(newStudy);
     setViewMode("analysis");
     setSelectedPatientStudy(null);

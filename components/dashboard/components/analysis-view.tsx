@@ -1,16 +1,18 @@
 import { Button } from "@/elements/button";
 import { Card } from "@/elements/card";
-import { AnalysisTab, CephAnalysisResult, CephStudy, EditableFindings, PatientInfo, PredictionObject } from "@/types";
+import { AnalysisSelection, AnalysisTab, CephAnalysisResult, CephStudy, EditableFindings, PatientInfo, PredictionObject } from "@/types";
 import { computeCephFromKeypoints } from "@/utils/cephalometrics";
 import { formatDateTime } from "@/utils/helpers";
 import { generateCephPdfReport } from "@/utils/pdfExport";
-import { Activity, AlertTriangle, ArrowLeft, Check, CheckCircle2, Clock3, Download, Eye, EyeOff, FileText, Layers, Move, Plus, Printer, Save, Sparkles, Trash2, User, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeft, Check, CheckCheck, CheckCircle2, Clock3, Download, Eye, EyeOff, FileText, Layers, Move, Plus, Printer, Save, Sparkles, Trash2, User, X, XCircle } from "lucide-react";
 import { ChangeEvent, useRef, useState } from "react";
 import { MeasurementCard } from "./measurment-card";
 import { Field } from "@/elements/field";
 import { SummaryRow } from "./summary-row";
 import { TreatmentCard } from "./treatment-card";
 import { CephLandmarks } from "./cephlandmarks";
+import { LandmarkManager } from "./landmark-manager";
+import { ANALYSIS_MODES, CEPH_LANDMARKS_KEYPOINTS } from "@/MOCK_DATA";
 
 
 export function AnalysisView({
@@ -96,7 +98,65 @@ export function AnalysisView({
 
   const [savedMessage, setSavedMessage] =
     useState("");
+    
+   
 
+const [analysisSelection, setAnalysisSelection] =
+  useState<AnalysisSelection>({
+    hardTissue: true,
+    softTissue: false,
+    modes: ["steiner"],
+    measurements: [],
+  });
+
+   //landmark selection
+   const [selectedLandmarks, setSelectedLandmarks] = useState<string[]>(
+  CEPH_LANDMARKS_KEYPOINTS
+    .filter((lm) => lm.category === "hard-tissue")
+    .map((lm) => lm.id)
+);
+
+console.log('analysisSelection', analysisSelection)
+
+const toggleLandmarkCategory = (category: "hard-tissue" | "soft-tissue") => {
+  // Get the new selection state
+  const newAnalysisSelection = {
+    ...analysisSelection,
+    [category === "hard-tissue" ? "hardTissue" : "softTissue"]:
+      !analysisSelection[
+        category === "hard-tissue" ? "hardTissue" : "softTissue"
+      ],
+  };
+
+  setAnalysisSelection(newAnalysisSelection);
+
+  // Get landmarks belonging to this category
+  const categoryLandmarkIds = CEPH_LANDMARKS_KEYPOINTS
+    .filter((lm) => lm.category === category)
+    .map((lm) => lm.id);
+
+  setSelectedLandmarks((prev) => {
+    const isSelected =
+      category === "hard-tissue"
+        ? analysisSelection.hardTissue
+        : analysisSelection.softTissue;
+
+    if (isSelected) {
+      // Category is being deselected → remove its landmarks
+      return prev.filter((id) => !categoryLandmarkIds.includes(id));
+    }
+
+    // Category is being selected → add its landmarks
+    return Array.from(new Set([...prev, ...categoryLandmarkIds]));
+  });
+};
+const toggleLandmark = (id: string) => {
+  setSelectedLandmarks((prev) =>
+    prev.includes(id)
+      ? prev.filter((item) => item !== id)
+      : [...prev, id]
+  );
+};
   const imageRef =
     useRef<HTMLImageElement>(null);
 
@@ -819,6 +879,95 @@ export function AnalysisView({
                 )}
               </div>
 
+              {/* Analysis Mode */}
+              <div className="p-4">
+                <Card className="p-5">
+  <div className="flex items-center justify-between mb-5">
+    <div>
+      <h3 className="font-bold text-green-700">
+        Analysis Components
+      </h3>
+
+      <p className="text-xs text-slate-500 mt-1">
+        Choose the anatomical and analytical components.
+      </p>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+    <button
+      type="button"
+      onClick={() =>
+      {
+        setAnalysisSelection((prev) => ({
+          ...prev,
+          hardTissue: !prev.hardTissue,
+        }))
+
+        toggleLandmarkCategory('hard-tissue')
+      }
+      }
+      className={`
+        p-4 rounded-xl relative border text-left cursor-pointer
+        ${
+          analysisSelection.hardTissue
+            ? "border-green-800 bg-green-50 text-green-700"
+            : "border-gray-800 bg-gray-50 "
+        }
+      `}
+    >
+      <div className="font-bold ">
+        Hard Tissue Analysis
+      </div>
+
+      <p className="text-xs text-slate-400 mt-1">
+        Skeletal, dental and vertical cephalometric measurements.
+      </p>
+        {
+          analysisSelection.hardTissue ? <CheckCheck className="text-green-700 absolute top-3 right-2"/> : <XCircle className="text-red-700 absolute top-3 right-2"/>
+        }
+
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+      {
+        setAnalysisSelection((prev) => ({
+          ...prev,
+          softTissue: !prev.softTissue,
+        }))
+           toggleLandmarkCategory('soft-tissue')
+      }
+      }
+      className={`
+        p-4 rounded-xl relative border cursor-pointer text-left
+        ${
+          analysisSelection.softTissue
+            ? "border-green-800 bg-green-50 text-green-700"
+            : "border-gray-800 bg-gray-50 "
+        }
+      `}
+    >
+      <div className="font-bold ">
+        Soft Tissue Analysis
+      </div>
+
+      <p className="text-xs text-slate-400 mt-1">
+        Profile, lips, nasolabial angle, facial convexity and
+        soft-tissue relationships.
+      </p>
+
+      {
+          analysisSelection.softTissue ? <CheckCheck className="text-green-700 absolute top-3 right-2"/> : <XCircle className="text-red-700 absolute top-3 right-2"/>
+        }
+    </button>
+
+  </div>
+</Card>
+              </div>
+
               <div className="p-5">
                 {!imageSrc ? (
                   <label className="flex min-h-[620px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center transition hover:border-green-300 hover:bg-green-50/30">
@@ -866,6 +1015,7 @@ export function AnalysisView({
                       {pointCount > 0 && (
                         <CephLandmarks
                           landmarks={landmarks}
+                          analysisSelection={analysisSelection}
                           onLandmarkChange={
                             handleLandmarkChange
                           }
@@ -897,6 +1047,7 @@ export function AnalysisView({
                         </div>
                       )}
                     </div>
+
 
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex flex-wrap gap-3 text-xs text-slate-500">
@@ -969,6 +1120,11 @@ export function AnalysisView({
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* landmark manager */}
+              <div>
+                <LandmarkManager onToggle={toggleLandmark} landmarks={landmarks} selectedLandmarks={selectedLandmarks}/>
               </div>
             </Card>
 
@@ -1048,6 +1204,51 @@ export function AnalysisView({
                   </div>
                 </Card>
               )}
+
+                            {/* analysis mode */}
+              <div className="p-1">
+              <Card className="p-5">
+                <p className="text-[10px] mb-4 font-bold uppercase tracking-wider text-[#166534]">
+                  Select Analysis Mode
+                </p>
+              <div className="grid grid-cols-2  gap-3 ">
+  {ANALYSIS_MODES.map((mode,idx) => {
+    const active = analysisSelection.modes.includes(mode.id);
+
+    return (
+      <button
+        key={mode.id}
+        onClick={() => {
+          setAnalysisSelection((prev) => ({
+            ...prev,
+            modes: active
+              ? prev.modes.filter((m) => m !== mode.id)
+              : [...prev.modes, mode.id],
+          }));
+        }}
+        className={`
+          p-4 rounded-xl border cursor-pointer text-left transition
+          ${idx === ANALYSIS_MODES.length -1 && 'w-full col-span-2'}
+          ${
+            active
+              ? "border-green-700 bg-green-50 text-green-700"
+              : "border-gray-800 bg-gray-50 text-black"
+          }
+        `}
+      >
+        <div className="font-bold ">
+          {mode.name}
+        </div>
+
+        <p className="text-[11px] text-slate-400 mt-1">
+          {mode.description}
+        </p>
+      </button>
+    );
+  })}
+</div>
+</Card>
+</div>
 
               <Card className="p-5">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">

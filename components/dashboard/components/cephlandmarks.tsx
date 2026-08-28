@@ -1,5 +1,463 @@
-import { Keypoint, PredictionObject } from "@/types";
-import { useState } from "react";
+// import { ANALYSIS_LANDMARKS_FOR_ANALYSISMODES, CEPH_LANDMARKS_KEYPOINTS } from "@/MOCK_DATA";
+// import { AnalysisSelection, Keypoint, PredictionObject } from "@/types";
+// import { useEffect, useState } from "react";
+
+// export function CephLandmarks({
+//   landmarks = [],
+//   onLandmarkChange,
+//   imageDimensions,
+//   showPlanes = true,
+//   showLabels = true,
+//   analysisSelection
+// }: {
+//   landmarks: PredictionObject[];
+//   onLandmarkChange?: (updated: PredictionObject[]) => void;
+//   imageDimensions: {
+//     width: number;
+//     height: number;
+//   };
+//   showPlanes?: boolean;
+//   showLabels?: boolean;
+//   analysisSelection: AnalysisSelection;
+// }) {
+//   const [activeDragIndex, setActiveDragIndex] = useState<number | string | null>(null);
+
+//   const [selectedLandmarks, setSelectedLandmarks] = useState<string[]>(
+//   CEPH_LANDMARKS_KEYPOINTS
+//     .filter((lm) => lm.category === "hard-tissue")
+//     .map((lm) => lm.id)
+// )
+
+// const toggleLandmark = (id: string) => {
+//   setSelectedLandmarks((prev) =>
+//     prev.includes(id)
+//       ? prev.filter((item) => item !== id)
+//       : [...prev, id]
+//   );
+// };
+
+// const getLandmarksForAnalyses = (modes: string[]) => {
+//   const landmarkIds = modes.flatMap(
+//     (mode) => ANALYSIS_LANDMARKS_FOR_ANALYSISMODES[mode] ?? []
+//   );
+
+//   return [...new Set(landmarkIds)];
+// };
+
+// useEffect(() => {
+//   const selectedIds = getLandmarksForAnalyses(
+//     analysisSelection.modes
+//   );
+
+//   setSelectedLandmarks(selectedIds);
+// }, [analysisSelection.modes]);
+
+//   const rawKeypoints: Keypoint[] = landmarks[0]?.keypoints || [];
+
+//   const extraKeypoints = rawKeypoints.map((kp) => ({
+//     ...kp,
+//     renderX: kp.x,
+//     renderY: kp.y,
+//   }));
+
+
+  
+ 
+//   const keypointsList = [
+//     ...extraKeypoints,
+//     {
+//       renderX: -10,
+//       renderY: -10,
+//       id: "ccee",
+//       class: "xgonion",
+//       x: -10,
+//       y: -10,
+//       confidence: 90,
+//     },
+//   ];
+//   const modifiedKeypointList = CEPH_LANDMARKS_KEYPOINTS.map((item) => {
+//     const n = keypointsList.find(keys=> keys.class.toLowerCase().trim() === item.id.toLowerCase().trim() )
+//     return {...item, x:n?.x, y:n?.y,renderX:n?.renderX,renderY:n?.renderY,class:n?.class,confidence:n?.confidence}
+//   })
+
+//   const getLM = (possibleLabels: string[], maxRelativeY?: number) => {
+//     const matches = keypointsList.filter((lm) =>
+//       possibleLabels.some(
+//         (label) =>
+//           lm.class?.toLowerCase().trim() === label.toLowerCase().trim(),
+//       ),
+//     );
+
+//     if (matches.length === 0) return undefined;
+
+//     if (maxRelativeY !== undefined) {
+//       const upperMatches = matches.filter((m) => m.renderY <= maxRelativeY);
+
+//       if (upperMatches.length > 0) {
+//         return upperMatches.reduce((prev, curr) =>
+//           curr.renderY < prev.renderY ? curr : prev,
+//         );
+//       }
+//     }
+
+//     return matches.reduce((prev, curr) =>
+//       (curr.confidence || 0) > (prev.confidence || 0) ? curr : prev,
+//     );
+//   };
+
+//   const sella = getLM(["sella", "s"], 450);
+//   const nasion = getLM(["nasion", "n"], 350);
+//   const ans = getLM(["ans"]);
+//   const pns = getLM(["pns"]);
+//   const aPoint = getLM(["subspinale", "a_point", "a"]);
+//   const bPoint = getLM(["supramentale", "b_point", "b"]);
+//   const menton = getLM(["mention", "me"]);
+//   const gonion = getLM(["gonion", "go"]);
+//   const xgonion = getLM(["xgonion"]);
+//   const porion = getLM(["ponion", "po"]);
+//   const orbitale = getLM(["orbitale", "or"]);
+//   const subnasale = getLM(["subnasale"]);
+//   const upperLip = getLM(["upper-lip", "upper_lip", "ls"]);
+//   const lowerLip = getLM(["lower-lip", "lower_lip", "li"]);
+//   const softPog = getLM(["soft-tissue-pogonion", "soft_pogonion", "pog_prime"]);
+
+//   const u1Tip = getLM([
+//     "upper-incisor-tip",
+//     "upper_incisor_tip",
+//     "u1_tip",
+//     "is",
+//   ]);
+
+//   const l1Tip = getLM([
+//     "lower-incisor-tip",
+//     "lower_incisor_tip",
+//     "l1_tip",
+//     "ii",
+//   ]);
+
+//   const l1Apex = getLM([
+//     "lower-incisor-apex",
+//     "lower_incisor_apex",
+//     "l1_apex",
+//     "ia",
+//   ]);
+
+//   const handleMouseDown = (index: number | string, e: React.MouseEvent) => {
+//     e.stopPropagation();
+//     setActiveDragIndex(index);
+//   };
+
+//   const svgPointFromMouse = (
+//   svg: SVGSVGElement,
+//   clientX: number,
+//   clientY: number
+// ) => {
+//   const rect = svg.getBoundingClientRect();
+
+//   const scale = Math.min(
+//     rect.width / imageDimensions.width,
+//     rect.height / imageDimensions.height
+//   );
+
+//   const renderedWidth = imageDimensions.width * scale;
+//   const renderedHeight = imageDimensions.height * scale;
+
+//   const offsetX = (rect.width - renderedWidth) / 2;
+//   const offsetY = (rect.height - renderedHeight) / 2;
+
+//   return {
+//     x: (clientX - rect.left - offsetX) / scale,
+//     y: (clientY - rect.top - offsetY) / scale,
+//   };
+// };
+
+//   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+//     if (activeDragIndex === null || !onLandmarkChange) {
+//       return;
+//     }
+//     const point = svgPointFromMouse(
+//     e.currentTarget,
+//     e.clientX,
+//     e.clientY
+//   );
+//     const rect = e.currentTarget.getBoundingClientRect();
+
+//     const newRenderX =
+//       ((e.clientX - rect.left) / rect.width) * imageDimensions.width;
+
+//     const newRenderY =
+//       ((e.clientY - rect.top) / rect.height) * imageDimensions.height;
+
+//     // const updatedKeypoints = [...rawKeypoints];
+//     const updatedKeypoints = rawKeypoints.map(item => item.class === activeDragIndex ? {... item, 
+//       x: Math.round(point.x),
+//       y: Math.round(point.y)} : item)
+
+//     onLandmarkChange([
+//       {
+//         ...landmarks[0],
+//         keypoints: updatedKeypoints,
+//       },
+//     ]);
+//   };
+
+//   const handleMouseUp = () => {
+//     setActiveDragIndex(null);
+//   };
+
+//   return (
+//     <svg
+//       viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
+//       className="absolute inset-0 z-20 h-full w-full cursor-crosshair select-none"
+//       onMouseMove={handleMouseMove}
+//       onMouseUp={handleMouseUp}
+//       onMouseLeave={handleMouseUp}
+//       xmlns="http://www.w3.org/2000/svg"
+//     >
+//       {showPlanes && (
+//         <g className="pointer-events-none">
+//           {analysisSelection.hardTissue && sella && nasion && (
+//             <line
+//               x1={sella.renderX}
+//               y1={sella.renderY}
+//               x2={nasion.renderX}
+//               y2={nasion.renderY}
+//               stroke="#ef4444"
+//               strokeWidth={2}
+//               strokeDasharray="5 3"
+//             />
+//           )}
+
+//           {analysisSelection.hardTissue && porion &&
+//             orbitale &&
+//             (() => {
+//               const dx = porion.renderX - orbitale.renderX;
+//               const dy = porion.renderY - orbitale.renderY;
+
+//               // How far beyond pns you want the line to extend
+//               const extension = 750;
+//               const extensionA = -150;
+
+//               // Normalize the direction vector
+//               const length = Math.sqrt(dx * dx + dy * dy);
+
+//               const unitX = dx / length;
+//               const unitY = dy / length;
+
+//               // New endpoint beyond Gonion
+//               const extendedX = porion.renderX + unitX * extension;
+//               const extendedY = porion.renderY + unitY * extension;
+
+//               // New endpoint beyond Orbitale
+//               const extendedOX = orbitale.renderX + unitX * extensionA;
+//               const extendedOY = orbitale.renderY + unitY * extensionA;
+
+//               return (
+//                 <line
+//                   x1={extendedOX}
+//                   y1={extendedOY}
+//                   x2={extendedX}
+//                   y2={extendedY}
+//                   stroke="#8b5cf6"
+//                   strokeWidth={1.5}
+//                   strokeDasharray="4 2"
+//                 />
+//               );
+//             })()}
+
+//           {analysisSelection.hardTissue &&  nasion && aPoint && (
+//             <line
+//               x1={nasion.renderX}
+//               y1={nasion.renderY}
+//               x2={aPoint.renderX}
+//               y2={aPoint.renderY}
+//               stroke="#22c55e"
+//               strokeWidth={1.5}
+//             />
+//           )}
+
+//           {analysisSelection.hardTissue && nasion && bPoint && (
+//             <line
+//               x1={nasion.renderX}
+//               y1={nasion.renderY}
+//               x2={bPoint.renderX}
+//               y2={bPoint.renderY}
+//               stroke="#16a34a"
+//               strokeWidth={1.5}
+//             />
+//           )}
+
+//           {analysisSelection.hardTissue && gonion &&
+//             menton &&
+//             (() => {
+//               const dx = gonion.renderX - menton.renderX;
+//               const dy = gonion.renderY - menton.renderY;
+
+//               // How far beyond Gonion you want the line to extend
+//               const extension = 550;
+
+//               // Normalize the direction vector
+//               const length = Math.sqrt(dx * dx + dy * dy);
+
+//               const unitX = dx / length;
+//               const unitY = dy / length;
+
+//               // New endpoint beyond Gonion
+//               const extendedX = gonion.renderX + unitX * extension;
+//               const extendedY = gonion.renderY + unitY * extension;
+
+//               return (
+//                 <line
+//                   x1={menton.renderX}
+//                   y1={menton.renderY}
+//                   x2={extendedX}
+//                   y2={extendedY}
+//                   stroke="#22c55e"
+//                   strokeWidth={2}
+//                 />
+//               );
+//             })()}
+
+//           {analysisSelection.hardTissue &&  ans &&
+//             pns &&
+//             (() => {
+//               const dx = pns.renderX - ans.renderX;
+//               const dy = pns.renderY - ans.renderY;
+
+//               // How far beyond pns you want the line to extend
+//               const extension = 750;
+
+//               // Normalize the direction vector
+//               const length = Math.sqrt(dx * dx + dy * dy);
+
+//               const unitX = dx / length;
+//               const unitY = dy / length;
+
+//               // New endpoint beyond Gonion
+//               const extendedX = pns.renderX + unitX * extension;
+//               const extendedY = pns.renderY + unitY * extension;
+
+//               return (
+//                 <line
+//                   x1={ans.renderX}
+//                   y1={ans.renderY}
+//                   x2={extendedX}
+//                   y2={extendedY}
+//                   stroke="#eab308"
+//                   strokeWidth={1.5}
+//                   strokeDasharray="3 3"
+//                 />
+//               );
+//             })()}
+
+//           {analysisSelection.hardTissue &&  l1Apex && l1Tip && (
+//             <line
+//               x1={l1Apex.renderX}
+//               y1={l1Apex.renderY}
+//               x2={l1Tip.renderX}
+//               y2={l1Tip.renderY}
+//               stroke="#ec4899"
+//               strokeWidth={1.5}
+//             />
+//           )}
+
+//           {analysisSelection.softTissue && subnasale && upperLip && lowerLip && softPog && (
+//             <path
+//               d={`M ${subnasale.renderX} ${subnasale.renderY}
+//                 Q ${upperLip.renderX} ${upperLip.renderY},
+//                 ${lowerLip.renderX} ${lowerLip.renderY}
+//                 T ${softPog.renderX} ${softPog.renderY}`}
+//               fill="none"
+//               stroke="#22c55e"
+//               strokeWidth={2}
+//               strokeDasharray="4 3"
+//             />
+//           )}
+//         </g>
+//       )}
+
+//       {analysisSelection.hardTissue && modifiedKeypointList.filter(item => item.category === 'hard-tissue' && selectedLandmarks.includes(item.id)).map((lm, idx) => (
+//         <g
+//           key={`${lm.class}-${idx}`}
+//           transform={`translate(${lm.renderX}, ${lm.renderY})`}
+//           onMouseDown={(e) => handleMouseDown(lm?.class as string, e)}
+//           className="group cursor-grab active:cursor-grabbing"
+//         >
+//           <circle
+//             r={8}
+//             fill="#22c55e"
+//             fillOpacity={0.35}
+//             stroke="#22c55e"
+//             strokeWidth={1.5}
+//             className="transition-all duration-150 group-hover:scale-150"
+//           />
+
+//           <circle r={2.5} fill="#ffffff" />
+
+//           {showLabels && (
+//             <text
+//               x={10}
+//               y={-7}
+//               fill="#ffffff"
+//               fontSize={10}
+//               fontWeight="600"
+//               className="pointer-events-none"
+//               style={{
+//                 paintOrder: "stroke",
+//                 stroke: "#000000",
+//                 strokeWidth: 3,
+//               }}
+//             >
+//               {lm.abbreviation}
+//             </text>
+//           )}
+//         </g>
+//       ))}
+
+//        {analysisSelection.softTissue && modifiedKeypointList.filter(item => item.category === 'soft-tissue' &&  selectedLandmarks.includes(item.id)).map((lm, idx) => (
+//         <g
+//           key={`${lm.class}-${idx}`}
+//           transform={`translate(${lm.renderX}, ${lm.renderY})`}
+//           onMouseDown={(e) => handleMouseDown(lm?.class as string, e)}
+//           className="group cursor-grab active:cursor-grabbing"
+//         >
+//           <circle
+//             r={8}
+//             fill="#22c55e"
+//             fillOpacity={0.35}
+//             stroke="#22c55e"
+//             strokeWidth={1.5}
+//             className="transition-all duration-150 group-hover:scale-150"
+//           />
+
+//           <circle r={2.5} fill="#ffffff" />
+
+//           {showLabels && (
+//             <text
+//               x={10}
+//               y={-7}
+//               fill="#ffffff"
+//               fontSize={10}
+//               fontWeight="600"
+//               className="pointer-events-none"
+//               style={{
+//                 paintOrder: "stroke",
+//                 stroke: "#000000",
+//                 strokeWidth: 3,
+//               }}
+//             >
+//               {lm.abbreviation}
+//             </text>
+//           )}
+//         </g>
+//       ))}
+//     </svg>
+//   );
+// }
+
+import { ANALYSIS_LANDMARKS_FOR_ANALYSISMODES, CEPH_ANALYSIS_CONFIG, CEPH_LANDMARKS_KEYPOINTS } from "@/MOCK_DATA";
+import { AnalysisSelection, Keypoint, PredictionObject } from "@/types";
+import { useEffect, useState } from "react";
 
 export function CephLandmarks({
   landmarks = [],
@@ -7,6 +465,7 @@ export function CephLandmarks({
   imageDimensions,
   showPlanes = true,
   showLabels = true,
+  analysisSelection
 }: {
   landmarks: PredictionObject[];
   onLandmarkChange?: (updated: PredictionObject[]) => void;
@@ -16,8 +475,54 @@ export function CephLandmarks({
   };
   showPlanes?: boolean;
   showLabels?: boolean;
+  analysisSelection: AnalysisSelection;
 }) {
-  const [activeDragIndex, setActiveDragIndex] = useState<number | null>(null);
+  const [activeDragIndex, setActiveDragIndex] = useState<number | string | null>(null);
+
+  const [selectedLandmarks, setSelectedLandmarks] = useState<string[]>(
+  CEPH_LANDMARKS_KEYPOINTS
+    .filter((lm) => lm.category === "hard-tissue")
+    .map((lm) => lm.id)
+)
+const [selectedTracing, setSelectedTracing] = useState<string[]>([])
+
+const toggleLandmark = (id: string) => {
+  setSelectedLandmarks((prev) =>
+    prev.includes(id)
+      ? prev.filter((item) => item !== id)
+      : [...prev, id]
+  );
+};
+
+const getLandmarksForAnalyses = (modes: string[]) => {
+  const landmarkIds = modes.flatMap(
+    (mode) => CEPH_ANALYSIS_CONFIG[mode]?.landmarks ?? []
+  );
+
+  return [...new Set(landmarkIds)];
+};
+
+const getTracingForAnalyses = (modes: string[]) => {
+  const tracings = modes.flatMap(
+    (mode) => CEPH_ANALYSIS_CONFIG[mode]?.tracings ?? []
+  );
+
+  return [...new Set(tracings)];
+};
+
+useEffect(() => {
+  const selectedIds = getLandmarksForAnalyses(
+    analysisSelection.modes
+  );
+   const selectedTracing = getTracingForAnalyses(
+    analysisSelection.modes
+  );
+
+  setSelectedLandmarks(selectedIds);
+  setSelectedTracing(selectedTracing);
+}, [analysisSelection.modes]);
+
+
 
   const rawKeypoints: Keypoint[] = landmarks[0]?.keypoints || [];
 
@@ -26,7 +531,10 @@ export function CephLandmarks({
     renderX: kp.x,
     renderY: kp.y,
   }));
+
+
   
+ 
   const keypointsList = [
     ...extraKeypoints,
     {
@@ -39,6 +547,10 @@ export function CephLandmarks({
       confidence: 90,
     },
   ];
+  const modifiedKeypointList = CEPH_LANDMARKS_KEYPOINTS.map((item) => {
+    const n = keypointsList.find(keys=> keys.class.toLowerCase().trim() === item.id.toLowerCase().trim() )
+    return {...item, x:n?.x, y:n?.y,renderX:n?.renderX,renderY:n?.renderY,class:n?.class,confidence:n?.confidence}
+  })
 
   const getLM = (possibleLabels: string[], maxRelativeY?: number) => {
     const matches = keypointsList.filter((lm) =>
@@ -73,6 +585,7 @@ export function CephLandmarks({
   const bPoint = getLM(["supramentale", "b_point", "b"]);
   const menton = getLM(["mention", "me"]);
   const gonion = getLM(["gonion", "go"]);
+  const articulare = getLM(["articulae","articule","articulare", "ar"]);
   const xgonion = getLM(["xgonion"]);
   const porion = getLM(["ponion", "po"]);
   const orbitale = getLM(["orbitale", "or"]);
@@ -102,16 +615,44 @@ export function CephLandmarks({
     "ia",
   ]);
 
-  const handleMouseDown = (index: number, e: React.MouseEvent) => {
+  const handleMouseDown = (index: number | string, e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveDragIndex(index);
   };
+
+  const svgPointFromMouse = (
+  svg: SVGSVGElement,
+  clientX: number,
+  clientY: number
+) => {
+  const rect = svg.getBoundingClientRect();
+
+  const scale = Math.min(
+    rect.width / imageDimensions.width,
+    rect.height / imageDimensions.height
+  );
+
+  const renderedWidth = imageDimensions.width * scale;
+  const renderedHeight = imageDimensions.height * scale;
+
+  const offsetX = (rect.width - renderedWidth) / 2;
+  const offsetY = (rect.height - renderedHeight) / 2;
+
+  return {
+    x: (clientX - rect.left - offsetX) / scale,
+    y: (clientY - rect.top - offsetY) / scale,
+  };
+};
 
   const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (activeDragIndex === null || !onLandmarkChange) {
       return;
     }
-
+    const point = svgPointFromMouse(
+    e.currentTarget,
+    e.clientX,
+    e.clientY
+  );
     const rect = e.currentTarget.getBoundingClientRect();
 
     const newRenderX =
@@ -120,13 +661,10 @@ export function CephLandmarks({
     const newRenderY =
       ((e.clientY - rect.top) / rect.height) * imageDimensions.height;
 
-    const updatedKeypoints = [...rawKeypoints];
-
-    updatedKeypoints[activeDragIndex] = {
-      ...updatedKeypoints[activeDragIndex],
-      x: Math.round(newRenderX),
-      y: Math.round(newRenderY),
-    };
+    // const updatedKeypoints = [...rawKeypoints];
+    const updatedKeypoints = rawKeypoints.map(item => item.class === activeDragIndex ? {... item, 
+      x: Math.round(point.x),
+      y: Math.round(point.y)} : item)
 
     onLandmarkChange([
       {
@@ -151,7 +689,7 @@ export function CephLandmarks({
     >
       {showPlanes && (
         <g className="pointer-events-none">
-          {sella && nasion && (
+          {analysisSelection.hardTissue && selectedTracing.includes('SN') && sella && nasion && (
             <line
               x1={sella.renderX}
               y1={sella.renderY}
@@ -163,7 +701,44 @@ export function CephLandmarks({
             />
           )}
 
-          {porion &&
+          {analysisSelection.hardTissue && selectedTracing.includes('SGo') && sella && gonion && (
+            <line
+              x1={sella.renderX}
+              y1={sella.renderY}
+              x2={gonion.renderX}
+              y2={gonion.renderY}
+              stroke="#ef4444"
+              strokeWidth={2}
+              strokeDasharray="5 3"
+            />
+          )}
+
+          {analysisSelection.hardTissue && selectedTracing.includes('NMe') && nasion && menton && (
+            <line
+              x1={nasion.renderX}
+              y1={nasion.renderY}
+              x2={menton.renderX}
+              y2={menton.renderY}
+              stroke="#ef4444"
+              strokeWidth={2}
+              strokeDasharray="5 3"
+            />
+          )}
+
+           {analysisSelection.hardTissue && selectedTracing.includes('ART-GO') && articulare && gonion && (
+            <line
+              x1={articulare.renderX}
+              y1={articulare.renderY}
+              x2={gonion.renderX}
+              y2={gonion.renderY}
+              stroke="#ef4444"
+              strokeWidth={2}
+              strokeDasharray="5 3"
+            />
+          )}
+      
+
+          {analysisSelection.hardTissue && selectedTracing.includes('PO') && porion &&
             orbitale &&
             (() => {
               const dx = porion.renderX - orbitale.renderX;
@@ -200,7 +775,7 @@ export function CephLandmarks({
               );
             })()}
 
-          {nasion && aPoint && (
+          {analysisSelection.hardTissue && selectedTracing.includes('NA') && nasion && aPoint && (
             <line
               x1={nasion.renderX}
               y1={nasion.renderY}
@@ -211,7 +786,7 @@ export function CephLandmarks({
             />
           )}
 
-          {nasion && bPoint && (
+          {analysisSelection.hardTissue && selectedTracing.includes('NB') &&  nasion && bPoint && (
             <line
               x1={nasion.renderX}
               y1={nasion.renderY}
@@ -222,14 +797,14 @@ export function CephLandmarks({
             />
           )}
 
-          {gonion &&
+          {analysisSelection.hardTissue && selectedTracing.includes('GO-ME') && gonion &&
             menton &&
             (() => {
               const dx = gonion.renderX - menton.renderX;
               const dy = gonion.renderY - menton.renderY;
 
               // How far beyond Gonion you want the line to extend
-              const extension = 550;
+              const extension = 750;
 
               // Normalize the direction vector
               const length = Math.sqrt(dx * dx + dy * dy);
@@ -253,7 +828,7 @@ export function CephLandmarks({
               );
             })()}
 
-          {ans &&
+          {analysisSelection.hardTissue && selectedTracing.includes('PNS-ANS') &&  ans &&
             pns &&
             (() => {
               const dx = pns.renderX - ans.renderX;
@@ -285,7 +860,7 @@ export function CephLandmarks({
               );
             })()}
 
-          {l1Apex && l1Tip && (
+          {analysisSelection.hardTissue &&  l1Apex && l1Tip && (
             <line
               x1={l1Apex.renderX}
               y1={l1Apex.renderY}
@@ -296,7 +871,7 @@ export function CephLandmarks({
             />
           )}
 
-          {subnasale && upperLip && lowerLip && softPog && (
+          {analysisSelection.softTissue && selectedTracing.includes('SOFT_TISSUE') && subnasale && upperLip && lowerLip && softPog && (
             <path
               d={`M ${subnasale.renderX} ${subnasale.renderY}
                 Q ${upperLip.renderX} ${upperLip.renderY},
@@ -311,11 +886,11 @@ export function CephLandmarks({
         </g>
       )}
 
-      {keypointsList.map((lm, idx) => (
+      {analysisSelection.hardTissue && modifiedKeypointList.filter(item => item.category === 'hard-tissue' && selectedLandmarks.includes(item?.id?.toLowerCase())).map((lm, idx) => (
         <g
           key={`${lm.class}-${idx}`}
           transform={`translate(${lm.renderX}, ${lm.renderY})`}
-          onMouseDown={(e) => handleMouseDown(idx, e)}
+          onMouseDown={(e) => handleMouseDown(lm?.class as string, e)}
           className="group cursor-grab active:cursor-grabbing"
         >
           <circle
@@ -343,7 +918,45 @@ export function CephLandmarks({
                 strokeWidth: 3,
               }}
             >
-              {lm.class}
+              {lm.abbreviation}
+            </text>
+          )}
+        </g>
+      ))}
+
+       {analysisSelection.softTissue && modifiedKeypointList.filter(item => item.category === 'soft-tissue' &&  selectedLandmarks.includes(item.id)).map((lm, idx) => (
+        <g
+          key={`${lm.class}-${idx}`}
+          transform={`translate(${lm.renderX}, ${lm.renderY})`}
+          onMouseDown={(e) => handleMouseDown(lm?.class as string, e)}
+          className="group cursor-grab active:cursor-grabbing"
+        >
+          <circle
+            r={8}
+            fill="#22c55e"
+            fillOpacity={0.35}
+            stroke="#22c55e"
+            strokeWidth={1.5}
+            className="transition-all duration-150 group-hover:scale-150"
+          />
+
+          <circle r={2.5} fill="#ffffff" />
+
+          {showLabels && (
+            <text
+              x={10}
+              y={-7}
+              fill="#ffffff"
+              fontSize={10}
+              fontWeight="600"
+              className="pointer-events-none"
+              style={{
+                paintOrder: "stroke",
+                stroke: "#000000",
+                strokeWidth: 3,
+              }}
+            >
+              {lm.abbreviation}
             </text>
           )}
         </g>
@@ -351,3 +964,4 @@ export function CephLandmarks({
     </svg>
   );
 }
+

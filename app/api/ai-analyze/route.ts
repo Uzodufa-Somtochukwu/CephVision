@@ -713,6 +713,36 @@ const analysisSchema = {
         Wits: measurementSchema,
         FMA: measurementSchema,
         IMPA: measurementSchema,
+        MMPA: measurementSchema,
+        "Co-A": measurementSchema,
+        "Co-Gn": measurementSchema,
+        "N-Perp-to-A": measurementSchema,
+        "N-Perp-to-Pog": measurementSchema,
+        "U1-SN": measurementSchema,
+        "U1-NA-angle": measurementSchema,
+        "U1-NA-linear": measurementSchema,
+        "L1-NB-angle": measurementSchema,
+        "L1-NB-linear": measurementSchema,
+        // "Inter-incisal-angle": measurementSchema,
+        // "Occlusal-plane-to-SN": measurementSchema,
+   
+        // "SN-MP": measurementSchema,
+        // "SN-GoGn": measurementSchema,
+        // "ANS-Me": measurementSchema,
+        // "N-ANS": measurementSchema,
+        "ANS-Me_N-Me": measurementSchema,
+        "Jarabak ratio": measurementSchema,
+        "Lower_anterior_facial_height": measurementSchema,
+        "Nasolabial_angle": measurementSchema,
+        "E-line-to-upper_lip": measurementSchema,
+        "E-line-to-lower_lip": measurementSchema,
+        "S-line-to-upper_lip": measurementSchema,
+        "S-line-to-lower_lip": measurementSchema,
+        "Mentolabial-to-angle": measurementSchema,
+        "Facial-to-convexity": measurementSchema,
+        "Upper-lip-thickness": measurementSchema,
+        "Lower-lip-thickness": measurementSchema,
+        "Lip-competence": measurementSchema,
       },
 
       required: [
@@ -722,6 +752,36 @@ const analysisSchema = {
         "Wits",
         "FMA",
         "IMPA",
+        "MMPA"
+        // "Co-A",
+        // "Co-Gn",
+        // "N-Perp-to-A",
+        // "N-Perp-to-Pog",
+        // "U1-SN",
+        // "U1-NA-angle",
+        // "U1-NA-linear",
+        // "L1-NB-angle",
+        // "L1-NB-linear",
+        // "Inter-incisal-angle",
+        // "Occlusal-plane-to-SN",
+        // "MMPA",
+        // "SN-MP",
+        // "SN-GoGn",
+        // "ANS-Me",
+        // "N-ANS",
+        // "ANS-Me_N-Me",
+        // "Jarabak ratio",
+        // "Lower_anterior_facial_height",
+        // "Nasolabial_angle",
+        // "E-line-to-upper_lip",
+        // "E-line-to-lower_lip",
+        // "S-line-to-upper_lip",
+        // "S-line-to-lower_lip",
+        // "Mentolabial-to-angle",
+        // "Facial-to-convexity",
+        // "Upper-lip-thickness",
+        // "Lower-lip-thickness",
+        // "Lip-competence",
       ],
     },
 
@@ -732,15 +792,12 @@ const analysisSchema = {
         skeletal: {
           type: Type.STRING,
         },
-
         dental: {
           type: Type.STRING,
         },
-
         softTissue: {
           type: Type.STRING,
         },
-
         growthPattern: {
           type: Type.STRING,
         },
@@ -761,23 +818,18 @@ const analysisSchema = {
         classification: {
           type: Type.STRING,
         },
-
         subtype: {
           type: Type.STRING,
         },
-
         summary: {
           type: Type.STRING,
         },
-
         skeletalPattern: {
           type: Type.STRING,
         },
-
         dentalPattern: {
           type: Type.STRING,
         },
-
         severity: {
           type: Type.STRING,
         },
@@ -795,7 +847,6 @@ const analysisSchema = {
 
     treatmentObjectives: {
       type: Type.ARRAY,
-
       items: {
         type: Type.STRING,
       },
@@ -990,12 +1041,50 @@ measurements from clinical interpretation.
 
 Calculate:
 
-- SNA
+-sagital measurements{
+  - SNA
 - SNB
 - ANB
 - Wits appraisal
 - FMA
 - IMPA
+- Co-A
+- Co-Gn
+- N-Perp to A
+- N-Perp to Pog
+}
+-dental measurements {
+-U1-SN
+-U1-NA angle
+-U1-NA linear
+-L1-NB angle
+-L1-NB linear
+-Inter-incisal angle
+-Occlusal plane to SN
+}
+-vertical measurements {
+  -FMA
+-MMPA
+-SN-MP
+-SN-GoGn
+-ANS-Me
+-N-ANS
+-ANS-Me / N-Me
+-Jarabak ratio
+-Lower anterior facial height
+}
+-soft tissue measurements {
+    -Nasolabial angle
+-E-line → upper lip
+-E-line → lower lip
+-S-line → upper lip
+-S-line → lower lip
+-Mentolabial angle
+-Facial convexity
+-Upper lip thickness
+-Lower lip thickness
+-Lip competence
+}
 
 Then determine:
 
@@ -1037,12 +1126,47 @@ cephalometric analysis.
 
 Required measurements:
 
-SNA
-SNB
-ANB
-Wits
-FMA
-IMPA
+  - SNA
+- SNB
+- ANB
+- Wits appraisal
+- FMA
+- IMPA
+- Co-A
+- Co-Gn
+- N-Perp to A
+- N-Perp to Pog
+-U1-SN
+-U1-NA angle
+-U1-NA linear
+-L1-NB angle
+-L1-NB linear
+-Inter-incisal angle
+-Occlusal plane to SN
+
+
+  -FMA
+-MMPA
+-SN-MP
+-SN-GoGn
+-ANS-Me
+-N-ANS
+-ANS-Me / N-Me
+-Jarabak ratio
+-Lower anterior facial height
+
+
+    -Nasolabial angle
+-E-line → upper lip
+-E-line → lower lip
+-S-line → upper lip
+-S-line → lower lip
+-Mentolabial angle
+-Facial convexity
+-Upper lip thickness
+-Lower lip thickness
+-Lip competence
+
 
 For every measurement provide:
 
