@@ -229,27 +229,40 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   // =========================
 
   {
-    id: "soft-nasion",
+    id: "soft-tissue-nasion",
     labels: ["soft-nasion", "soft_nasion", "n-prime", "n'"],
     abbreviation: "N′",
     name: "Soft Tissue Nasion",
     category: "soft-tissue",
     requiredFor: ["soft-tissue", "comprehensive"],
+    renderX: 100,
+      renderY: 70,
+      class: "soft-tissue-nasion",
+      x: 100,
+      y: 70,
+      confidence: 0.9,
   },
 
   
 
   {
-    id: "upper-lip",
+    id: "Upper-Lip",
     labels: ["upper-lip", "upper_lip", "ls"],
     abbreviation: "Ls",
     name: "Labrale Superius",
     category: "soft-tissue",
     requiredFor: ["soft-tissue", "comprehensive"],
   },
-
+   {
+    id: "nose-tip",
+    labels: ["nose-tip", "nose-tip", "n-t"],
+    abbreviation: "NT",
+    name: "Nose Tip",
+    category: "soft-tissue",
+    requiredFor: ["soft-tissue", "comprehensive"],
+  },
   {
-    id: "lower-lip",
+    id: "Lower-Lip",
     labels: ["lower-lip", "lower_lip", "li"],
     abbreviation: "Li",
     name: "Labrale Inferius",
@@ -258,7 +271,7 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   },
 
   {
-    id: "soft-pogonion",
+    id: "soft-tissue-pogonion",
     labels: [
       "soft-tissue-pogonion",
       "soft_pogonion",
@@ -270,7 +283,17 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
     category: "soft-tissue",
     requiredFor: ["soft-tissue", "comprehensive"],
   },
-
+{
+    id: "glabella",
+    labels: [
+      "glabella",
+      "glabella"
+    ],
+    abbreviation: "G′",
+    name: "Glabella",
+    category: "soft-tissue",
+    requiredFor: ["soft-tissue", "comprehensive"],
+  },
   {
     id: "soft-menton",
     labels: ["soft-menton", "soft_menton", "me-prime", "me'"],
@@ -410,15 +433,17 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "mention",
       "ponion",
       "orbitale",
+      "pogonion",
+      "gnathion",
       "ans",
       "pns",
       "u1Tip",
       "l1Tip",
       "l1Apex",
       "subnasale",
-      "upperLip",
-      "lowerLip",
-      "softPog",
+      "Upper-Lip",
+      "Lower-Lip",
+      "soft-tissue-pogonion",
     ],
 
     tracings: [
@@ -430,6 +455,27 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "PNS-ANS",
       "L1_AXIS",
       "SOFT_TISSUE",
+    ],
+  },
+
+   "soft-tissue": { 
+    landmarks: [
+      "subnasale",
+      "Upper-Lip",
+      "Lower-Lip",
+      "soft-tissue-pogonion",
+      "soft-tissue-nasion",
+      "nose-tip",
+      "ponion",
+      "glabella",
+      "orbitale"
+    ],
+
+    tracings: [ 
+      "SOFT_TISSUE",
+      "NT-SPO",
+      'GL-NT',
+      "PO"
     ],
   },
 
@@ -448,6 +494,8 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "NMe",
       "ART-GO",
       "GO-ME",
+      "S-ART",
+      "N-GO",
     ],
   },
 

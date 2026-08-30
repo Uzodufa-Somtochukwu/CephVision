@@ -24,6 +24,12 @@ export interface LandmarkDefinition {
   category: LandmarkCategory;
   description?: string;
   requiredFor?: AnalysisMode[];
+  renderX?:number;
+  renderY?:number;
+  x?:number;
+  y?:number;
+  class?:string;
+  confidence?:number
 };
 export interface Keypoint {
   id?: string;

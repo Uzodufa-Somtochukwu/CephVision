@@ -457,7 +457,9 @@
 
 import { ANALYSIS_LANDMARKS_FOR_ANALYSISMODES, CEPH_ANALYSIS_CONFIG, CEPH_LANDMARKS_KEYPOINTS } from "@/MOCK_DATA";
 import { AnalysisSelection, Keypoint, PredictionObject } from "@/types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AngleAnnotation, Point } from "./svg-angle";
+import { getLineIntersection } from "@/utils/helpers";
 
 export function CephLandmarks({
   landmarks = [],
@@ -526,6 +528,8 @@ useEffect(() => {
 
   const rawKeypoints: Keypoint[] = landmarks[0]?.keypoints || [];
 
+  
+
   const extraKeypoints = rawKeypoints.map((kp) => ({
     ...kp,
     renderX: kp.x,
@@ -545,8 +549,36 @@ useEffect(() => {
       x: -10,
       y: -10,
       confidence: 90,
+    },{
+       id:'soft-tissue-nasion',
+       renderX: 1069,
+      renderY: 343,
+      class:"soft-tissue-nasion",
+      x: 1069,
+      y: 343,
+      confidence: 0.9,
     },
+    {
+       id:'nose-tip',
+       renderX: 1219,
+        renderY: 558,
+      class:"nose-tip",
+      x: 1219,
+      y: 558,
+      confidence: 0.9,
+    },
+    {
+      id:'glabella',
+       renderX: 1051,
+       renderY: 95,
+      class:"glabella",
+      x: 1051,
+      y: 95,
+      confidence: 0.9,
+    }
   ];
+
+  console.log('keypoinssss',keypointsList)
   const modifiedKeypointList = CEPH_LANDMARKS_KEYPOINTS.map((item) => {
     const n = keypointsList.find(keys=> keys.class.toLowerCase().trim() === item.id.toLowerCase().trim() )
     return {...item, x:n?.x, y:n?.y,renderX:n?.renderX,renderY:n?.renderY,class:n?.class,confidence:n?.confidence}
@@ -593,6 +625,10 @@ useEffect(() => {
   const upperLip = getLM(["upper-lip", "upper_lip", "ls"]);
   const lowerLip = getLM(["lower-lip", "lower_lip", "li"]);
   const softPog = getLM(["soft-tissue-pogonion", "soft_pogonion", "pog_prime"]);
+  // new points to add to models
+  const softNas = getLM(["soft-tissue-nasion", "soft_nasion", "sn"]);
+  const noseTip = getLM(["nose-tip", "nose-tip", "n-t"]);
+  const glabella = getLM(["glabella", "glabella", "g-l"]);
 
   const u1Tip = getLM([
     "upper-incisor-tip",
@@ -662,7 +698,7 @@ useEffect(() => {
       ((e.clientY - rect.top) / rect.height) * imageDimensions.height;
 
     // const updatedKeypoints = [...rawKeypoints];
-    const updatedKeypoints = rawKeypoints.map(item => item.class === activeDragIndex ? {... item, 
+    const updatedKeypoints = keypointsList.map(item => item.class === activeDragIndex ? {... item, 
       x: Math.round(point.x),
       y: Math.round(point.y)} : item)
 
@@ -678,6 +714,42 @@ useEffect(() => {
     setActiveDragIndex(null);
   };
 
+  const mandibularPlaneIntersection = useMemo(() => {
+  if (!ans || !pns || !gonion || !menton) {
+    return null;
+  }
+
+  return getLineIntersection(
+    ans,
+    pns,
+    gonion,
+    menton
+  );
+}, [
+  ans,
+  pns,
+  gonion,
+  menton,
+]);
+
+ const FrankfurtPlaneIntersection = useMemo(() => {
+  if (!porion || !orbitale || !gonion || !menton) {
+    return null;
+  }
+
+  return getLineIntersection(
+    porion,
+    orbitale,
+    gonion,
+    menton
+  );
+}, [
+  porion,
+  orbitale,
+  gonion,
+  menton,
+]);
+
   return (
     <svg
       viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
@@ -687,6 +759,126 @@ useEffect(() => {
       onMouseLeave={handleMouseUp}
       xmlns="http://www.w3.org/2000/svg"
     >
+      {/* angles */}
+      {selectedTracing.includes('SN') && selectedTracing.includes('NA') && sella && nasion && aPoint && (
+        <AngleAnnotation
+          p1={sella}
+          vertex={nasion}
+          p2={aPoint}
+          label="SNA"
+        />
+      )}
+      {selectedTracing.includes('SN') && selectedTracing.includes('NB') && sella && nasion && bPoint && (
+        <AngleAnnotation
+          p1={sella}
+          vertex={nasion}
+          p2={bPoint}
+          label="SNB"
+          labelOffsetX={20}
+          labelOffsetY={20}
+        />
+      )}
+
+      {selectedTracing.includes('SN') && selectedTracing.includes('NB') && sella && aPoint && nasion && bPoint && (
+        <AngleAnnotation
+          p1={sella}
+          vertex={nasion}
+          p2={aPoint}
+          p3={bPoint}
+          label="ANB"
+          calculation="anb"
+          labelOffsetX={40}
+          labelOffsetY={40}
+        />
+      )}
+
+{/* jarabak angles */}
+      {selectedTracing.includes('SN') && selectedTracing.includes('S-ART') && sella && nasion && articulare && (
+        <AngleAnnotation
+          p1={nasion}
+          vertex={sella}
+          p2={articulare}
+          label="Saddle"
+          calculation="standard"
+          labelOffsetX={10}
+          labelOffsetY={10}
+        />
+      )}
+
+       {selectedTracing.includes('S-ART') && selectedTracing.includes('ART-GO') && sella && articulare && gonion && (
+        <AngleAnnotation
+          p1={sella}
+          vertex={articulare}
+          p2={gonion}
+          label="Articular"
+          calculation="standard"
+          labelOffsetX={10}
+          labelOffsetY={10}
+        />
+      )}
+      
+      {selectedTracing.includes('ART-GO') && selectedTracing.includes('GO-ME') && articulare && gonion && menton && (
+        <AngleAnnotation
+          p1={articulare}
+          vertex={gonion}
+          p2={menton}
+          label="gonial"
+          calculation="standard"
+          labelOffsetX={30}
+          labelOffsetY={30}
+        />
+      )}
+
+      {selectedTracing.includes('ART-GO') && selectedTracing.includes('N-GO') && articulare && gonion && nasion && (
+        <AngleAnnotation
+          p1={articulare}
+          vertex={gonion}
+          p2={nasion}
+          label="upper gonial"
+          calculation="standard"
+          labelOffsetX={-30}
+          labelOffsetY={-30}
+        />
+      )}
+
+     
+      {selectedTracing.includes('N-GO') && selectedTracing.includes('GO-ME') && nasion && gonion && menton && (
+        <AngleAnnotation
+          p1={nasion}
+          vertex={gonion}
+          p2={menton}
+          label="lower gonial"
+          calculation="standard"
+          labelOffsetX={60}
+          labelOffsetY={60}
+        />
+      )}
+
+      { selectedTracing.includes('PNS-ANS') && selectedTracing.includes('GO-ME') && pns && gonion && menton && (
+        <AngleAnnotation
+          p1={pns}
+          vertex={mandibularPlaneIntersection as Point}
+          p2={gonion}
+          label="MMPA"
+          calculation="standard"
+          labelOffsetX={10}
+          labelOffsetY={60}
+        />
+      )}
+
+       { selectedTracing.includes('PO') && selectedTracing.includes('GO-ME') && porion && gonion && menton && (
+        <AngleAnnotation
+          p1={porion}
+          vertex={FrankfurtPlaneIntersection as Point}
+          p2={gonion}
+          label="FMA"
+          calculation="standard"
+          labelOffsetX={400}
+          labelOffsetY={60}
+        />
+      )}
+
+    {/* planes */}
       {showPlanes && (
         <g className="pointer-events-none">
           {analysisSelection.hardTissue && selectedTracing.includes('SN') && sella && nasion && (
@@ -746,7 +938,7 @@ useEffect(() => {
 
               // How far beyond pns you want the line to extend
               const extension = 750;
-              const extensionA = -150;
+              const extensionA = -350;
 
               // Normalize the direction vector
               const length = Math.sqrt(dx * dx + dy * dy);
@@ -783,6 +975,29 @@ useEffect(() => {
               y2={aPoint.renderY}
               stroke="#22c55e"
               strokeWidth={1.5}
+            />
+          )}
+
+          {analysisSelection.hardTissue && selectedTracing.includes('S-ART') && sella && articulare && (
+            <line
+              x1={sella.renderX}
+              y1={sella.renderY}
+              x2={articulare.renderX}
+              y2={articulare.renderY}
+              stroke="#22c55e"
+              strokeWidth={1.5}
+            />
+          )}
+
+          {analysisSelection.hardTissue && selectedTracing.includes('N-GO') && nasion && gonion && (
+            <line
+              x1={nasion.renderX}
+              y1={nasion.renderY}
+              x2={gonion.renderX}
+              y2={gonion.renderY}
+              stroke="#22c55e"
+              strokeWidth={1.5}
+              
             />
           )}
 
@@ -870,10 +1085,166 @@ useEffect(() => {
               strokeWidth={1.5}
             />
           )}
+           
+           {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && softNas && (
+            <line
+              x1={softNas.renderX}
+              y1={softNas.renderY}
+              x2={softPog.renderX}
+              y2={softPog.renderY}
+              stroke="#ec4899"
+              strokeWidth={1.5}
+            />
+          )}
+           {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && noseTip && (
+            <line
+              x1={noseTip.renderX}
+              y1={noseTip.renderY}
+              x2={softPog.renderX}
+              y2={softPog.renderY}
+              stroke="#ec4899"
+              strokeWidth={1.5}
+            />
+          )}
+          {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && noseTip &&
+            (() => {
+              const dx = softPog.renderX - noseTip.renderX;
+              const dy = softPog.renderY - noseTip.renderY;
 
-          {analysisSelection.softTissue && selectedTracing.includes('SOFT_TISSUE') && subnasale && upperLip && lowerLip && softPog && (
+              // How far beyond nose you want the line to extend
+              const extension = 750;
+              const extensionA = -350;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond Orbitale
+              const extendedOX = noseTip.renderX + unitX * extensionA;
+              const extendedOY = noseTip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={softPog.renderX}
+                  y1={softPog.renderY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#8b5cf6"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+          
+          {/* pogonion-lowerlip */}
+          {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && lowerLip &&
+            (() => {
+              const dx = softPog.renderX - lowerLip.renderX;
+              const dy = softPog.renderY - lowerLip.renderY;
+
+              // How far beyond nose you want the line to extend
+              const extension = 750;
+              const extensionA = -450;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond Orbitale
+              const extendedOX = lowerLip.renderX + unitX * extensionA;
+              const extendedOY = lowerLip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={softPog.renderX}
+                  y1={softPog.renderY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#ec4899"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+          
+          {/* pogonion-upperlip */}
+          {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && upperLip &&
+            (() => {
+              const dx = softPog.renderX - upperLip.renderX;
+              const dy = softPog.renderY - upperLip.renderY;
+
+              // How far beyond nose you want the line to extend
+              const extension = 750;
+              const extensionA = -450;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond Orbitale
+              const extendedOX = upperLip.renderX + unitX * extensionA;
+              const extendedOY = upperLip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={softPog.renderX}
+                  y1={softPog.renderY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#eab308"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+
+            {/* glabella-nosetip */}
+          {analysisSelection.softTissue && selectedTracing.includes('GL-NT') && glabella  && noseTip &&
+            (() => {
+              const dx = glabella.renderX - noseTip.renderX;
+              const dy = glabella.renderY - noseTip.renderY;
+
+              // How far beyond nose you want the line to extend
+              const extension = 750;
+              const extensionA = -450;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond Orbitale
+              const extendedOX = noseTip.renderX + unitX * extensionA;
+              const extendedOY = noseTip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={glabella.renderX}
+                  y1={glabella.renderY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#ec4899"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+          {analysisSelection.softTissue && selectedTracing.includes('SOFT_TISSUE') && noseTip && softNas && subnasale && upperLip && lowerLip && softPog && (
             <path
-              d={`M ${subnasale.renderX} ${subnasale.renderY}
+              d={`M${softNas.renderX} ${softNas.renderY}
+                  ${noseTip.renderX} ${noseTip.renderY}
+                ${subnasale.renderX} ${subnasale.renderY}
                 Q ${upperLip.renderX} ${upperLip.renderY},
                 ${lowerLip.renderX} ${lowerLip.renderY}
                 T ${softPog.renderX} ${softPog.renderY}`}
@@ -883,6 +1254,7 @@ useEffect(() => {
               strokeDasharray="4 3"
             />
           )}
+          
         </g>
       )}
 
