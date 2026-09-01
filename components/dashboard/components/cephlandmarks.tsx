@@ -560,7 +560,8 @@ useEffect(() => {
     },
     {
        id:'nose-tip',
-       renderX: 1219,
+      //  renderX: 1219,
+      renderX: 1219,
         renderY: 558,
       class:"nose-tip",
       x: 1219,
@@ -575,7 +576,42 @@ useEffect(() => {
       x: 1051,
       y: 95,
       confidence: 0.9,
-    }
+    },
+    {
+      id:'lower-incisor-tip',
+       renderX: 1053,
+        renderY: 759,
+      class:"lower-incisor-tip",
+      x: 1053,
+      y: 759,
+      confidence: 0.9,
+    },
+    {
+      id:'lower-incisor-apex',
+        renderX: 968, 
+        renderY: 894, 
+      class:"lower-incisor-apex",
+      x: 968,
+      y: 894,
+      confidence: 0.9,
+    },
+    {
+      id:'upper-incisor-apex',
+        renderX: 1013,
+        renderY: 646, 
+      class:"upper-incisor-apex",
+      x: 1013,
+      y: 646,
+      confidence: 0.9,
+    },
+    {
+      id:'upper-incisor-tip',
+       renderX: 1053, renderY: 770,
+      class:"upper-incisor-tip",
+      x: 1053,
+      y: 770,
+      confidence: 0.9,
+    },
   ];
 
   console.log('keypoinssss',keypointsList)
@@ -629,12 +665,19 @@ useEffect(() => {
   const softNas = getLM(["soft-tissue-nasion", "soft_nasion", "sn"]);
   const noseTip = getLM(["nose-tip", "nose-tip", "n-t"]);
   const glabella = getLM(["glabella", "glabella", "g-l"]);
-
+  
   const u1Tip = getLM([
     "upper-incisor-tip",
     "upper_incisor_tip",
     "u1_tip",
     "is",
+  ]);
+
+  const u1Apex = getLM([
+    "upper-incisor-apex",
+    "upper_incisor_apex",
+    "u1_apex",
+    "ia",
   ]);
 
   const l1Tip = getLM([
@@ -748,6 +791,138 @@ useEffect(() => {
   orbitale,
   gonion,
   menton,
+]);
+
+const softNasSoftPogPlaneIntersection = useMemo(() => {
+  if (!porion || !orbitale || !softNas || !softPog) {
+    return null;
+  }
+
+  return getLineIntersection(
+    porion,
+    orbitale,
+    softNas,
+    softPog
+  );
+}, [
+  porion,
+  orbitale,
+  softNas,
+  softPog,
+]);
+
+const zAngleIntersection = useMemo(() => {
+  if (!porion || !orbitale || !softPog || !lowerLip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    porion,
+    orbitale,
+    lowerLip,
+    softPog
+  );
+}, [
+  porion,
+  orbitale,
+  lowerLip,
+  softPog,
+]);
+
+//to help calculate the total facial angle
+const totalFacialAngleIntersection = useMemo(() => {
+  if (!porion || !orbitale || !softPog || !noseTip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    porion,
+    orbitale,
+    noseTip,
+    softPog
+  );
+}, [
+  porion,
+  orbitale,
+  noseTip,
+  softPog,
+]);
+
+
+//to help calculate the upper incisor to SN angle
+const u1SNAngleIntersection = useMemo(() => {
+  if (!sella|| !nasion || !u1Apex || !u1Tip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    sella,
+    nasion,
+    u1Apex,
+    u1Tip
+  );
+}, [
+  sella,
+  nasion,
+  u1Apex,
+  u1Tip,
+]);
+
+//to help calculate the IMPA angle
+const IMPAAngleIntersection = useMemo(() => {
+  if (!gonion || !menton || !l1Apex || !l1Tip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    gonion,
+    menton,
+    l1Tip,
+    l1Apex
+  );
+}, [
+  gonion,
+  menton,
+  l1Tip,
+  l1Apex,
+]);
+
+//to help calculate the IFPA angle
+const IFPAAngleIntersection = useMemo(() => {
+  if (!porion || !orbitale || !u1Apex || !u1Tip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    porion,
+    orbitale,
+    u1Tip,
+    u1Apex
+  );
+}, [
+  porion,
+  orbitale,
+  u1Tip,
+  u1Apex,
+]);
+
+//to help calculate the Interincisal angle
+const InterIncisalAngleIntersection = useMemo(() => {
+  if (!l1Apex || !l1Tip || !u1Apex || !u1Tip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    u1Apex,
+    u1Tip,
+    l1Tip,
+    l1Apex
+  );
+}, [
+  u1Apex,
+  u1Tip,
+  l1Tip,
+  l1Apex,
 ]);
 
   return (
@@ -877,6 +1052,122 @@ useEffect(() => {
           labelOffsetY={60}
         />
       )}
+      
+      {/* orbitale - soft tissue pogonion */}
+      { selectedTracing.includes('SOFTNAS-SOFTPOG') && selectedTracing.includes('PO') && orbitale && softPog && (
+        <AngleAnnotation
+          p1={orbitale}
+          vertex={softNasSoftPogPlaneIntersection as Point}
+          p2={softPog}
+          label="STFA"
+          calculation="standard"
+          labelOffsetX={10}
+          labelOffsetY={20}
+        />
+      )}
+  {/* z-angle, can be from the soft pogonion to upper or lower lips depending on the most protrusive one */}
+      { selectedTracing.includes('SOFTPOG-LLIP') && selectedTracing.includes('PO') && orbitale && lowerLip && (
+        <AngleAnnotation
+          p1={orbitale}
+          vertex={zAngleIntersection as Point}
+          p2={lowerLip}
+          label="Z-angle"
+          calculation="standard"
+          labelOffsetX={70}
+          labelOffsetY={-40}
+        />
+      )}
+
+    {/* total facial angle */}
+      { selectedTracing.includes('NT-SPO') && selectedTracing.includes('PO') && glabella && noseTip && (
+        <AngleAnnotation
+          p1={glabella}
+          vertex={noseTip as Point}
+          p2={totalFacialAngleIntersection as Point}
+          label="TFA"
+          calculation="standard"
+          labelOffsetX={10}
+          labelOffsetY={80}
+        />
+      )}
+
+          {/* Holdaway angle */}
+      { selectedTracing.includes('SOFTPOG-ULIP') && selectedTracing.includes('SOFTNAS-SOFTPOG') && glabella && noseTip && (
+        <AngleAnnotation
+          p1={softNas as Point}
+          vertex={softPog as Point}
+          p2={upperLip as Point}
+          label="H-angle"
+          calculation="standard"
+          labelOffsetX={70}
+          labelOffsetY={30}
+        />
+      )}
+
+        {/* Nasolabial angle */}
+      { selectedTracing.includes('SOFT_TISSUE') && selectedTracing.includes('SubN-NT')  && subnasale && upperLip && noseTip && (
+        <AngleAnnotation
+          p1={noseTip as Point}
+          vertex={subnasale as Point}
+          p2={upperLip as Point}
+          label="Nasolabial-angle"
+          calculation="standard"
+          labelOffsetX={20}
+          labelOffsetY={30}
+        />
+      )}
+
+        {/* U1-SN angle */}
+      { selectedTracing.includes('U1-SN') && selectedTracing.includes("SN") && u1Tip && u1Apex && (
+        <AngleAnnotation
+          p1={u1Apex as Point}
+          vertex={u1SNAngleIntersection as Point}
+          p2={sella as Point}
+          label="U1-SN"
+          calculation="standard"
+          labelOffsetX={20}
+          labelOffsetY={30}
+        />
+      )}
+
+        {/* IMPA angle */}
+      { selectedTracing.includes('l1Apex-l1Tip') && selectedTracing.includes("GO-ME") && l1Apex && gonion && (
+        <AngleAnnotation
+          p1={l1Apex as Point}
+          vertex={IMPAAngleIntersection as Point}
+          p2={gonion as Point}
+          label="IMPA"
+          calculation="standard"
+          labelOffsetX={20}
+          labelOffsetY={30}
+        />
+      )}
+
+       {/* IFPA angle */}
+      { selectedTracing.includes('u1Apex-u1Tip') && selectedTracing.includes("PO") && u1Apex && gonion && (
+        <AngleAnnotation
+          p1={u1Apex as Point}
+          vertex={IFPAAngleIntersection as Point}
+          p2={porion as Point}
+          label="IFPA"
+          calculation="standard"
+          labelOffsetX={20}
+          labelOffsetY={30}
+        />
+      )}
+
+       {/* Interincisal angle */}
+      { selectedTracing.includes('u1Apex-u1Tip') && selectedTracing.includes("l1Apex-l1Tip") && u1Apex && gonion && (
+        <AngleAnnotation
+          p1={u1Apex as Point}
+          vertex={InterIncisalAngleIntersection as Point}
+          p2={l1Apex as Point}
+          label="Inter-incisal"
+          calculation="standard"
+          labelOffsetX={20}
+          labelOffsetY={60}
+        />
+      )}
 
     {/* planes */}
       {showPlanes && (
@@ -946,7 +1237,7 @@ useEffect(() => {
               const unitX = dx / length;
               const unitY = dy / length;
 
-              // New endpoint beyond Gonion
+              // New endpoint beyond ponion
               const extendedX = porion.renderX + unitX * extension;
               const extendedY = porion.renderY + unitY * extension;
 
@@ -1240,12 +1531,89 @@ useEffect(() => {
                 />
               );
             })()}
-          {analysisSelection.softTissue && selectedTracing.includes('SOFT_TISSUE') && noseTip && softNas && subnasale && upperLip && lowerLip && softPog && (
+          
+          {/* lower incisor apex to lower incisor tip */}
+           {analysisSelection.hardTissue && selectedTracing.includes('l1Apex-l1Tip') && l1Apex && l1Tip  &&
+            (() => {
+              const dx = l1Tip.renderX - l1Apex.renderX;
+              const dy = l1Tip.renderY - l1Apex.renderY;
+
+              // How far beyond nose you want the line to extend
+              const extension = 750;
+              const extensionA = -440;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond lower incisor apex
+              const extendedOX = l1Apex.renderX + unitX * extension;
+              const extendedOY = l1Apex.renderY + unitY * extension;
+
+               // New endpoint beyond lower incisor tip
+              const extendedX = l1Tip.renderX + unitX * extensionA;
+              const extendedY = l1Tip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={extendedX}
+                  y1={extendedY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#eab308"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+
+           {/* upper incisor apex to upper incisor tip */}
+           {analysisSelection.hardTissue && selectedTracing.includes('u1Apex-u1Tip') && u1Tip && u1Apex &&
+              (() => {
+              const dx = u1Tip.renderX - u1Apex.renderX;
+              const dy = u1Tip.renderY - u1Apex.renderY;
+
+              // How far beyond nose you want the line to extend
+              const extension = 350;
+              const extensionA = -840;
+
+              // Normalize the direction vector
+              const length = Math.sqrt(dx * dx + dy * dy);
+
+              const unitX = dx / length;
+              const unitY = dy / length;
+
+            
+              // New endpoint beyond lower incisor apex
+              const extendedOX = u1Apex.renderX + unitX * extension;
+              const extendedOY = u1Apex.renderY + unitY * extension;
+
+               // New endpoint beyond lower incisor tip
+              const extendedX = u1Tip.renderX + unitX * extensionA;
+              const extendedY = u1Tip.renderY + unitY * extensionA;
+
+              return (
+                <line
+                  x1={extendedX}
+                  y1={extendedY}
+                  x2={extendedOX}
+                  y2={extendedOY}
+                  stroke="#eab308"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 2"
+                />
+              );
+            })()}
+
+         { analysisSelection.softTissue && selectedTracing.includes('SOFT_TISSUE') && noseTip && softNas && subnasale && upperLip && lowerLip && softPog && (
             <path
               d={`M${softNas.renderX} ${softNas.renderY}
                   ${noseTip.renderX} ${noseTip.renderY}
                 ${subnasale.renderX} ${subnasale.renderY}
-                Q ${upperLip.renderX} ${upperLip.renderY},
+                 Q ${upperLip.renderX} ${upperLip.renderY},
                 ${lowerLip.renderX} ${lowerLip.renderY}
                 T ${softPog.renderX} ${softPog.renderY}`}
               fill="none"
@@ -1257,6 +1625,8 @@ useEffect(() => {
           
         </g>
       )}
+
+
 
       {analysisSelection.hardTissue && modifiedKeypointList.filter(item => item.category === 'hard-tissue' && selectedLandmarks.includes(item?.id?.toLowerCase())).map((lm, idx) => (
         <g

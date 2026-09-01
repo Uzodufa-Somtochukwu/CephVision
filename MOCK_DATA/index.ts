@@ -204,7 +204,7 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
       "l1_tip",
       "ii",
     ],
-    abbreviation: "L1",
+    abbreviation: "L1T",
     name: "Lower Incisor Incisal Tip",
     category: "hard-tissue",
     requiredFor: ["steiner", "tweed", "comprehensive"],
@@ -444,6 +444,10 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "Upper-Lip",
       "Lower-Lip",
       "soft-tissue-pogonion",
+      "lower-incisor-apex",
+      "lower-incisor-tip",
+      "upper-incisor-tip",
+      "upper-incisor-apex"
     ],
 
     tracings: [
@@ -455,6 +459,9 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "PNS-ANS",
       "L1_AXIS",
       "SOFT_TISSUE",
+      "l1Apex-l1Tip",
+      "u1Apex-u1Tip",
+      "U1-SN"
     ],
   },
 
@@ -474,8 +481,12 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
     tracings: [ 
       "SOFT_TISSUE",
       "NT-SPO",
-      'GL-NT',
-      "PO"
+      "GL-NT",
+      "SOFTNAS-SOFTPOG",
+      "SOFTPOG-LLIP",
+      "SOFTPOG-ULIP",
+      "PO",
+      "SubN-NT"
     ],
   },
 
@@ -497,6 +508,21 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "S-ART",
       "N-GO",
     ],
+  },
+  tweed:{
+    landmarks:[
+      'ponion',
+      'orbitale',
+      'gonion',
+      'mention',
+      'lower-incisor-tip',
+      'lower-incisor-apex'
+    ],
+    tracings: [
+      'PO',
+      'GO-ME',
+      'l1Apex-l1Tip'
+    ]
   },
 
   mcnamara: {
