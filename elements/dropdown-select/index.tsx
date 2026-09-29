@@ -1,6 +1,6 @@
 import React from 'react';
 import Select,{ components } from 'react-select';
-import FormLabel from '../text/form-label';
+
 
 export interface SelectDropdownTypes {
   defaultValue?: any;
@@ -127,7 +127,8 @@ const SelectDropdown = React.forwardRef(function SelectDropdown(
     <div ref={ref} className={`${className}`}>
       {
         showLabel && <div className="mb-1 -mt-[2px] font-normal">
-        <FormLabel htmlFor={name} title={label} />
+          {label}
+        {/* <FormLabel htmlFor={name} title={label} /> */}
       </div>
       }
       {multiSelect ? (
