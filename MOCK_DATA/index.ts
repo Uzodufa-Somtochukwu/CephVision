@@ -1,4 +1,123 @@
-import { AnalysisMode, LandmarkDefinition } from "@/types";
+import { AnalysisMode, CephAnalysisResult, LandmarkDefinition } from "@/types";
+
+
+export const mockCephAnalysisResult: CephAnalysisResult = {
+  landmarks: [],
+
+  measurements: {
+    SNA: {
+      value: 80,
+      norm: "82 ± 2°",
+      interpretation: "Maxillary position is within the normal range.",
+      status: "normal",
+    },
+
+    SNB: {
+      value: 84,
+      norm: "80 ± 2°",
+      interpretation: "Mandibular position is increased relative to the cranial base, suggesting mandibular prognathism.",
+      status: "high",
+    },
+
+    ANB: {
+      value: -4,
+      norm: "2 ± 2°",
+      interpretation: "Negative ANB indicates a skeletal Class III relationship.",
+      status: "low",
+    },
+
+    Wits: {
+      value: -5,
+      norm: "0 ± 2 mm",
+      interpretation: "Negative Wits appraisal supports a skeletal Class III anteroposterior relationship.",
+      status: "low",
+    },
+
+    FMA: {
+      value: 24,
+      norm: "25 ± 5°",
+      interpretation: "Mandibular plane angle is within the normal range, suggesting an average vertical growth pattern.",
+      status: "normal",
+    },
+
+    IMPA: {
+      value: 82,
+      norm: "90 ± 5°",
+      interpretation: "Lower incisors are retroclined relative to the mandibular plane, consistent with dental compensation of the skeletal Class III relationship.",
+      status: "low",
+    },
+
+     IIA: {
+      value: 82,
+      norm: "90 ± 5°",
+      interpretation: "Lower incisors are retroclined relative to the mandibular plane, consistent with dental compensation of the skeletal Class III relationship.",
+      status: "low",
+    },
+  },
+
+  aiFindings: {
+    skeletal:
+      "The cephalometric measurements demonstrate a skeletal Class III pattern characterized primarily by increased mandibular prominence. SNA is within normal limits while SNB is increased, resulting in a negative ANB and negative Wits appraisal. This suggests that mandibular prognathism is a greater contributor to the sagittal skeletal discrepancy than maxillary deficiency.",
+
+    dental:
+      "The lower incisors demonstrate relative retroclination, suggesting dental compensation for the underlying skeletal Class III discrepancy. The upper incisors should be assessed for compensatory proclination and the presence of an anterior crossbite should be correlated clinically.",
+
+    softTissue:
+      "The soft-tissue profile may demonstrate increased lower facial prominence and a relatively concave facial profile associated with the underlying skeletal Class III relationship. Soft-tissue findings should be correlated with clinical examination and facial photographs.",
+
+    growthPattern:
+      "The FMA is within the normal range, suggesting an average vertical growth pattern. The sagittal skeletal discrepancy appears to be the predominant cephalometric abnormality.",
+  },
+
+  malocclusion: {
+    classification: "Class III",
+
+    subtype: "Skeletal Class III predominantly associated with mandibular prognathism",
+
+    summary:
+      "The cephalometric findings are consistent with a skeletal Class III malocclusion, characterized by an increased SNB, negative ANB, and negative Wits appraisal. The maxillary position is approximately normal, while mandibular prominence appears to contribute substantially to the sagittal discrepancy.",
+
+    skeletalPattern:
+      "Skeletal Class III pattern with a relatively prominent mandible and normal-to-mildly retrusive maxillary position.",
+
+    dentalPattern:
+      "Dental compensation is suggested by retroclination of the mandibular incisors. Clinical examination is required to determine the extent of anterior crossbite and the relationship of the upper incisors.",
+
+    severity: "Moderate",
+  },
+
+  treatmentObjectives: [
+    "Correct the anterior-posterior skeletal and dental discrepancy.",
+    "Establish a functional and stable overjet and overbite.",
+    "Correct anterior crossbite if clinically present.",
+    "Improve incisor inclination while maintaining periodontal health.",
+    "Coordinate the upper and lower dental arches.",
+    "Improve facial and soft-tissue balance where orthodontically achievable.",
+    "Establish functional occlusion with appropriate canine and molar relationships.",
+    "Maintain long-term stability following active treatment.",
+  ],
+
+  treatmentPlans: {
+    braces: {
+      title: "Comprehensive Fixed Orthodontic Treatment",
+      description:
+        "Fixed orthodontic appliances with comprehensive arch coordination and controlled incisor positioning. Treatment mechanics should account for the underlying skeletal Class III relationship and the existing dental compensation.",
+      duration: "18–24 months",
+      
+    } as any,
+
+    aligners: {
+      title: "Comprehensive Clear Aligner Treatment",
+      description:
+        "Clear aligners may be considered for selected cases where the skeletal discrepancy is within the range that can be managed orthodontically. Treatment requires careful control of incisor movement and assessment of aligner predictability.",
+      duration: "18–30 months",
+      
+    } as any,
+  },
+
+  patientSummary:
+    "The cephalometric analysis demonstrates a moderate skeletal Class III relationship. The primary sagittal finding is increased mandibular prominence, with the maxilla positioned approximately within normal limits. The negative ANB and Wits values support the skeletal Class III diagnosis, while the reduced IMPA suggests compensatory retroclination of the mandibular incisors. The vertical skeletal pattern is approximately average based on the FMA. Treatment planning should be based on the patient's age, growth status, clinical examination, facial profile, occlusion, periodontal condition, and severity of the skeletal discrepancy.",
+};
 
 export const ANALYSIS_MODES: {
   id: AnalysisMode;
@@ -93,17 +212,18 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   },
   //soft tissue
   {
-    id: "Subspinale",
-    labels: ["a", "a point", "a_point", "subspinale"],
+    id: "a-point",
+    labels: ["a", "a-point", "a_point","a-point", "subspinale"],
     abbreviation: "A",
     name: "A Point / Subspinale",
     category: "hard-tissue",
     requiredFor: ["steiner", "mcnamara", "wits", "comprehensive"],
   },
+  
 
   {
-    id: "supramentale",
-    labels: ["b", "b point", "b_point", "supramentale"],
+    id: "b-point",
+    labels: ["b", "b-point", "b_point",'b-point', "supramentale"],
     abbreviation: "B",
     name: "B Point / Supramentale",
     category: "hard-tissue",
@@ -138,8 +258,8 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   },
 
   {
-    id: "ponion",
-    labels: ["porion", "po"],
+    id: "porion",
+    labels: ["porion", "po","ponion"],
     abbreviation: "Po",
     name: "Porion",
     category: "hard-tissue",
@@ -169,9 +289,9 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   // =========================
 
   {
-    id: "upper-incisor-tip",
+    id: "upper-incisor",
     labels: [
-      "upper-incisor-tip",
+      "upper-incisor",
       "upper_incisor_tip",
       "u1_tip",
       "is",
@@ -183,8 +303,9 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   },
 
   {
-    id: "upper-incisor-apex",
+    id: "incisor-apex",
     labels: [
+      "incisor-apex",
       "upper-incisor-apex",
       "upper_incisor_apex",
       "u1_apex",
@@ -197,9 +318,9 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
   },
 
   {
-    id: "lower-incisor-tip",
+    id: "lower-incisor",
     labels: [
-      "lower-incisor-tip",
+      "lower-incisor",
       "lower_incisor_tip",
       "l1_tip",
       "ii",
@@ -302,6 +423,14 @@ export const CEPH_LANDMARKS_KEYPOINTS: LandmarkDefinition[] = [
     category: "soft-tissue",
     requiredFor: ["soft-tissue", "comprehensive"],
   },
+  {
+    id: "s-intersection",
+    labels: ["nose-tip-subnasale-intersection", "s-intersection"],
+    abbreviation: "NT-I",
+    name: "nose-tip-subnasale-intersection",
+    category: "soft-tissue",
+    requiredFor: ["soft-tissue", "comprehensive"],
+  }
 ];
 
 export const ANALYSIS_LANDMARKS_FOR_ANALYSISMODES: Record<string, string[]> = {
@@ -428,10 +557,12 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "sella",
       "nasion",
       "subspinale",
+      "a-point",
+      "b-point",
       "supramentale",
       "gonion",
       "mention",
-      "ponion",
+      "porion",
       "orbitale",
       "pogonion",
       "gnathion",
@@ -439,15 +570,15 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "pns",
       "u1Tip",
       "l1Tip",
-      "l1Apex",
-      "subnasale",
-      "Upper-Lip",
-      "Lower-Lip",
-      "soft-tissue-pogonion",
+     
+      // "subnasale",
+      // "Upper-Lip",
+      // "Lower-Lip",
+      // "soft-tissue-pogonion",
       "lower-incisor-apex",
-      "lower-incisor-tip",
-      "upper-incisor-tip",
-      "upper-incisor-apex"
+      "lower-incisor",
+      "upper-incisor",
+      "incisor-apex"
     ],
 
     tracings: [
@@ -458,7 +589,6 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "GO-ME",
       "PNS-ANS",
       "L1_AXIS",
-      "SOFT_TISSUE",
       "l1Apex-l1Tip",
       "u1Apex-u1Tip",
       "U1-SN"
@@ -475,7 +605,8 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       "nose-tip",
       "ponion",
       "glabella",
-      "orbitale"
+      "orbitale",
+      "s-intersection"
     ],
 
     tracings: [ 
@@ -524,6 +655,70 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
       'l1Apex-l1Tip'
     ]
   },
+  comprehensive: {
+    landmarks:[
+      "sella",
+      "nasion",
+      "a-point",
+      "b-point",
+      "gonion",
+      "mention",
+      "ponion",
+      "orbitale",
+      "pogonion",
+      "articulae",
+      "gnathion",
+      "ans",
+      "pns",
+      "u1Tip",
+      "l1Tip",
+      "l1Apex",
+      "subnasale",
+      "Upper-Lip",
+      "Lower-Lip",
+      "soft-tissue-pogonion",
+      "lower-incisor-apex",
+      "lower-incisor",
+      "upper-incisor",
+      "upper-incisor-apex",
+      "subnasale",
+      "Upper-Lip",
+      "Lower-Lip",
+      "soft-tissue-pogonion",
+      "soft-tissue-nasion",
+      "nose-tip",
+      "ponion",
+      "glabella",
+      "orbitale",
+      "s-intersection"
+    ],
+    tracings:[
+      "NA",
+      "NB",
+      "GO-ME",
+      "PNS-ANS",
+      "L1_AXIS",
+      "SOFT_TISSUE",
+      "l1Apex-l1Tip",
+      "u1Apex-u1Tip",
+      "U1-SN",
+        "SOFT_TISSUE",
+      "NT-SPO",
+      "GL-NT",
+      "SOFTNAS-SOFTPOG",
+      "SOFTPOG-LLIP",
+      "SOFTPOG-ULIP",
+      "PO",
+      "SubN-NT",
+        "SN",
+      "SGo",
+      "NMe",
+      "ART-GO",
+      "GO-ME",
+      "S-ART",
+      "N-GO",
+    ]
+  },
 
   mcnamara: {
     landmarks: [
@@ -549,3 +744,6 @@ export const CEPH_ANALYSIS_CONFIG:Record<string,Record<string, string[]>> = {
     ],
   },
 } 
+
+
+

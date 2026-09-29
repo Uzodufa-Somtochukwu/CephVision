@@ -116,6 +116,13 @@ export default function App() {
     setViewMode("analysis");
   };
 
+   const handleOpenPatienStudy = (
+    study: CephStudy
+  ) => {
+    setCurrentStudy(study);
+   
+  };
+
   /* OPEN PATIENT */
 
   const handleOpenPatient = (
@@ -146,6 +153,35 @@ export default function App() {
     setCurrentStudy(null);
     setViewMode("patients");
   };
+
+  const groupedPatients = studies.reduce<
+    Record<string, CephStudy[]>
+  >((acc, study) => {
+    const patientId =
+      study.patient.id || study.patient.name;
+
+    if (!acc[patientId]) {
+      acc[patientId] = [];
+    }
+
+    acc[patientId].push(study);
+
+    return acc;
+  }, {});
+
+  const patients = Object.values(groupedPatients)
+    .map((patientStudies) => {
+      const latest = [...patientStudies].sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() -
+          new Date(a.updatedAt).getTime()
+      )[0];
+
+      return {
+        latest,
+        count: patientStudies.length,
+      };
+    })
 
   /* LOADING  */
 
@@ -193,6 +229,7 @@ export default function App() {
     return (
       <PatientList
         studies={studies}
+        allPatient = {patients}
         onNewAnalysis={handleNewAnalysis}
         onOpenPatient={
           handleOpenPatient
@@ -206,12 +243,15 @@ export default function App() {
   if (currentStudy) {
     return (
       <AnalysisView
+      studies={studies}
+      allPatient={patients}
         study={currentStudy}
         onSave={handleSaveStudy}
         onBack={() => {
           setCurrentStudy(null);
           setViewMode("patients");
         }}
+        handleOpenStudy ={handleOpenPatienStudy}
         onDelete={handleDeleteStudy}
         onNewAnalysis={ handleNewAnalysis}
       />

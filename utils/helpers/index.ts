@@ -90,18 +90,18 @@ export function createEmptyStudy(selectedPatientId:string = ''): CephStudy {
 }
 
 export const calculateAngle = (
-  p1: { renderX: number; renderY: number },
+  p1: { renderX: number ; renderY: number  },
   vertex: { renderX: number; renderY: number },
   p2: { renderX: number; renderY: number }
 ) => {
   const v1 = {
-    x: p1.renderX - vertex.renderX,
-    y: p1.renderY - vertex.renderY,
+    x: (p1.renderX || 0) - (vertex?.renderX || 0),
+    y: (p1.renderY || 0) - (vertex?.renderY || 0),
   };
 
   const v2 = {
-    x: p2.renderX - vertex.renderX,
-    y: p2.renderY - vertex.renderY,
+    x: (p2?.renderX || 0) - (vertex?.renderX ||0),
+    y: (p2?.renderY || 0) - (vertex?.renderY || 0),
   };
 
   const dot = v1.x * v2.x + v1.y * v2.y;

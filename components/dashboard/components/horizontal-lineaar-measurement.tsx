@@ -136,7 +136,7 @@ type LinearMeasurementProps = {
   imgDetails?:{height:number; width:number}
 };
 
-export function LinearMeasurement({
+export function HorizontalLinearMeasurement({
   p1,
   p2,
   lineEnd,
@@ -159,8 +159,9 @@ export function LinearMeasurement({
     const dy = p2.renderY - p1.renderY;
 
    
-
-    const pixelDistance = Math.hypot(dx, dy);
+    //horizontal distance between two points
+    const pixelDistance = dx
+    // const pixelDistance = Math.hypot(dx, dy);
 
     if (!pixelDistance) {
       return null;
@@ -286,7 +287,7 @@ export function LinearMeasurement({
   const measurementDY = projectionY - p1.renderY;
 
 
-  const pixelDistance = measurementDY
+  const pixelDistance = measurementDX
   
   // diagonal distance from one point to another
 // const pixelDistance = Math.hypot(

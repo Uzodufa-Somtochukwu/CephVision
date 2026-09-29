@@ -1,4 +1,6 @@
+import { useAppContext } from "@/providers/context-provider";
 import { calculateAngle } from "@/utils/helpers";
+import { useEffect } from "react";
 
 export type Point = {
   renderX: number;
@@ -34,6 +36,8 @@ export const AngleAnnotation = ({
   labelOffsetX = 0,
   labelOffsetY= 0 
 }: AngleAnnotationProps) => {
+
+  const { setAngle } = useAppContext()
 const calculateANB = (
   sella: Point,
   nasion: Point,
@@ -72,17 +76,20 @@ if (calculation === "standard") {
   );
 }
   
+  
+   
+  
 
   if (angle === null) return null;
 
   const angle1 = Math.atan2(
-    p1.renderY - vertex.renderY,
-    p1.renderX - vertex.renderX
+    p1?.renderY - vertex?.renderY,
+    p1?.renderX - vertex?.renderX
   );
 
   const angle2 = Math.atan2(
-    p2.renderY - vertex.renderY,
-    p2.renderX - vertex.renderX
+    p2?.renderY - vertex?.renderY,
+    p2?.renderX - vertex?.renderX
   );
 
   // Normalize so we draw the smaller angle
@@ -137,6 +144,12 @@ if (calculation === "standard") {
   const labelY =
     vertex.renderY +
     labelRadius * Math.sin(midAngle) + labelOffsetY;
+
+    useEffect(() => {
+    if (angle !== null && !Number.isNaN(angle)) {
+      setAngle(label, Number(angle.toFixed(1)));
+    }
+  }, [label, angle, setAngle]);
 
   return (
     <g className="pointer-events-none">

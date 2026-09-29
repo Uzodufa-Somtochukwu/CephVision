@@ -136,7 +136,7 @@ type LinearMeasurementProps = {
   imgDetails?:{height:number; width:number}
 };
 
-export function LinearMeasurement({
+export function VerticalLinearMeasurement({
   p1,
   p2,
   lineEnd,
@@ -160,7 +160,8 @@ export function LinearMeasurement({
 
    
 
-    const pixelDistance = Math.hypot(dx, dy);
+    const pixelDistance = dy;
+    // const pixelDistance = Math.hypot(dx, dy);
 
     if (!pixelDistance) {
       return null;

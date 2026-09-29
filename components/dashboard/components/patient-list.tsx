@@ -5,45 +5,23 @@ import { Activity, ChevronRight, Plus, Search, User, Users } from "lucide-react"
 import { useState } from "react";
 
 export function PatientList({
+  allPatient,
   studies,
   onNewAnalysis,
   onOpenPatient,
 }: {
   studies: CephStudy[];
+  allPatient: {
+    latest:CephStudy;
+    count:number
+  }[]
   onNewAnalysis: () => void;
   onOpenPatient: (study: CephStudy) => void;
 }) {
   const [search, setSearch] = useState("");
 
-  const groupedPatients = studies.reduce<
-    Record<string, CephStudy[]>
-  >((acc, study) => {
-    const patientId =
-      study.patient.id || study.patient.name;
-
-    if (!acc[patientId]) {
-      acc[patientId] = [];
-    }
-
-    acc[patientId].push(study);
-
-    return acc;
-  }, {});
-
-  const patients = Object.values(groupedPatients)
-    .map((patientStudies) => {
-      const latest = [...patientStudies].sort(
-        (a, b) =>
-          new Date(b.updatedAt).getTime() -
-          new Date(a.updatedAt).getTime()
-      )[0];
-
-      return {
-        latest,
-        count: patientStudies.length,
-      };
-    })
-    .filter(({ latest }) => {
+  
+    const patients = allPatient.filter(({ latest }) => {
       const query = search.toLowerCase().trim();
 
       if (!query) return true;

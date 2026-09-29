@@ -460,6 +460,9 @@ import { AnalysisSelection, Keypoint, PredictionObject } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import { AngleAnnotation, Point } from "./svg-angle";
 import { getLineIntersection } from "@/utils/helpers";
+import { LinearMeasurement } from "./linear-measurement";
+import { VerticalLinearMeasurement } from "./vertical-linear-measurement";
+import { HorizontalLinearMeasurement } from "./horizontal-lineaar-measurement";
 
 export function CephLandmarks({
   landmarks = [],
@@ -549,69 +552,13 @@ useEffect(() => {
       x: -10,
       y: -10,
       confidence: 90,
-    },{
-       id:'soft-tissue-nasion',
-       renderX: 1069,
-      renderY: 343,
-      class:"soft-tissue-nasion",
-      x: 1069,
-      y: 343,
-      confidence: 0.9,
     },
-    {
-       id:'nose-tip',
-      //  renderX: 1219,
-      renderX: 1219,
-        renderY: 558,
-      class:"nose-tip",
-      x: 1219,
-      y: 558,
-      confidence: 0.9,
-    },
-    {
-      id:'glabella',
-       renderX: 1051,
-       renderY: 95,
-      class:"glabella",
-      x: 1051,
-      y: 95,
-      confidence: 0.9,
-    },
-    {
-      id:'lower-incisor-tip',
-       renderX: 1053,
-        renderY: 759,
-      class:"lower-incisor-tip",
-      x: 1053,
-      y: 759,
-      confidence: 0.9,
-    },
-    {
-      id:'lower-incisor-apex',
-        renderX: 968, 
-        renderY: 894, 
-      class:"lower-incisor-apex",
-      x: 968,
-      y: 894,
-      confidence: 0.9,
-    },
-    {
-      id:'upper-incisor-apex',
-        renderX: 1013,
-        renderY: 646, 
-      class:"upper-incisor-apex",
-      x: 1013,
-      y: 646,
-      confidence: 0.9,
-    },
-    {
-      id:'upper-incisor-tip',
-       renderX: 1053, renderY: 770,
-      class:"upper-incisor-tip",
-      x: 1053,
-      y: 770,
-      confidence: 0.9,
-    },
+   
+   
+    
+  
+    
+   
   ];
 
   console.log('keypoinssss',keypointsList)
@@ -649,13 +596,13 @@ useEffect(() => {
   const nasion = getLM(["nasion", "n"], 350);
   const ans = getLM(["ans"]);
   const pns = getLM(["pns"]);
-  const aPoint = getLM(["subspinale", "a_point", "a"]);
-  const bPoint = getLM(["supramentale", "b_point", "b"]);
+  const aPoint = getLM(["subspinale", "a_point", "a","a-point"]);
+  const bPoint = getLM(["supramentale", "b_point","b-point", "b"]);
   const menton = getLM(["mention", "me"]);
   const gonion = getLM(["gonion", "go"]);
   const articulare = getLM(["articulae","articule","articulare", "ar"]);
   const xgonion = getLM(["xgonion"]);
-  const porion = getLM(["ponion", "po"]);
+  const porion = getLM(["porion","ponion"]);
   const orbitale = getLM(["orbitale", "or"]);
   const subnasale = getLM(["subnasale"]);
   const upperLip = getLM(["upper-lip", "upper_lip", "ls"]);
@@ -665,23 +612,24 @@ useEffect(() => {
   const softNas = getLM(["soft-tissue-nasion", "soft_nasion", "sn"]);
   const noseTip = getLM(["nose-tip", "nose-tip", "n-t"]);
   const glabella = getLM(["glabella", "glabella", "g-l"]);
+  const ntToSubnaleIntersection = getLM(['nose-tip-subnasale-intersection', 's-intersection'])
   
   const u1Tip = getLM([
-    "upper-incisor-tip",
+    "upper-incisor",
     "upper_incisor_tip",
     "u1_tip",
     "is",
   ]);
 
   const u1Apex = getLM([
-    "upper-incisor-apex",
+    "incisor-apex",
     "upper_incisor_apex",
     "u1_apex",
     "ia",
   ]);
 
   const l1Tip = getLM([
-    "lower-incisor-tip",
+    "lower-incisor",
     "lower_incisor_tip",
     "l1_tip",
     "ii",
@@ -689,6 +637,7 @@ useEffect(() => {
 
   const l1Apex = getLM([
     "lower-incisor-apex",
+    "Lower-Incisor-Apex",
     "lower_incisor_apex",
     "l1_apex",
     "ia",
@@ -925,6 +874,25 @@ const InterIncisalAngleIntersection = useMemo(() => {
   l1Apex,
 ]);
 
+//to help calculate the Upper lip - Eline
+const upperLipElineIntersection = useMemo(() => {
+  if (!l1Apex || !l1Tip || !u1Apex || !u1Tip) {
+    return null;
+  }
+
+  return getLineIntersection(
+    u1Apex,
+    u1Tip,
+    l1Tip,
+    l1Apex
+  );
+}, [
+  u1Apex,
+  u1Tip,
+  l1Tip,
+  l1Apex,
+]);
+
   return (
     <svg
       viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
@@ -997,7 +965,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={articulare}
           vertex={gonion}
           p2={menton}
-          label="gonial"
+          label="Gonial"
           calculation="standard"
           labelOffsetX={30}
           labelOffsetY={30}
@@ -1009,7 +977,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={articulare}
           vertex={gonion}
           p2={nasion}
-          label="upper gonial"
+          label="Upper_Gonial"
           calculation="standard"
           labelOffsetX={-30}
           labelOffsetY={-30}
@@ -1022,7 +990,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={nasion}
           vertex={gonion}
           p2={menton}
-          label="lower gonial"
+          label="Lower_Gonial"
           calculation="standard"
           labelOffsetX={60}
           labelOffsetY={60}
@@ -1071,7 +1039,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={orbitale}
           vertex={zAngleIntersection as Point}
           p2={lowerLip}
-          label="Z-angle"
+          label="Z_Angle"
           calculation="standard"
           labelOffsetX={70}
           labelOffsetY={-40}
@@ -1097,10 +1065,10 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={softNas as Point}
           vertex={softPog as Point}
           p2={upperLip as Point}
-          label="H-angle"
+          label="H_Angle"
           calculation="standard"
           labelOffsetX={70}
-          labelOffsetY={30}
+          labelOffsetY={50}
         />
       )}
 
@@ -1110,7 +1078,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={noseTip as Point}
           vertex={subnasale as Point}
           p2={upperLip as Point}
-          label="Nasolabial-angle"
+          label="NLA"
           calculation="standard"
           labelOffsetX={20}
           labelOffsetY={30}
@@ -1123,7 +1091,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={u1Apex as Point}
           vertex={u1SNAngleIntersection as Point}
           p2={sella as Point}
-          label="U1-SN"
+          label="U1_SN"
           calculation="standard"
           labelOffsetX={20}
           labelOffsetY={30}
@@ -1162,12 +1130,170 @@ const InterIncisalAngleIntersection = useMemo(() => {
           p1={u1Apex as Point}
           vertex={InterIncisalAngleIntersection as Point}
           p2={l1Apex as Point}
-          label="Inter-incisal"
+          label="IIncisal"
           calculation="standard"
           labelOffsetX={20}
           labelOffsetY={60}
         />
       )}
+
+      {/* Linear measurement */}
+
+      {/* <VerticalLinearMeasurement
+      p1={nasion as Point}
+      p2={menton as Point}
+      label="N-M"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+    /> */}
+
+//straight line from nasion to menton
+{
+  analysisSelection.hardTissue && selectedTracing.includes('NMe')  && (
+    <VerticalLinearMeasurement
+  p1={nasion as Point}
+  p2={menton as Point}
+  lineEnd={{renderX:menton?.renderX as number + 700, renderY:menton?.renderY} as Point}
+  label="AFH"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+   imgDetails={imageDimensions}
+   offsetLabel={-45}
+/>
+  )
+}
+
+{
+  analysisSelection.hardTissue && selectedTracing.includes('NMe')  && (
+    <VerticalLinearMeasurement
+  p1={sella as Point}
+  p2={gonion as Point}
+   label="PFH"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+      offsetLabel={200}
+/>
+  )
+}
+
+
+
+{
+  analysisSelection.softTissue && selectedTracing.includes("SOFT_TISSUE") && (
+  <>
+
+      //straight line from subnasale to menton
+<VerticalLinearMeasurement
+  p1={subnasale as Point}
+  p2={menton as Point}
+  lineEnd={{renderX:menton?.renderX as number + 700, renderY:menton?.renderY} as Point}
+  label="LFH"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+   imgDetails={imageDimensions}
+   offsetLabel={-150}
+/>
+
+//lowerlip to Eline 
+      <HorizontalLinearMeasurement
+  p1={lowerLip as Point}
+  p2={softPog as Point}
+  lineEnd={noseTip}
+  label="LL-E"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+  offsetLabel={260}
+   imgDetails={imageDimensions}
+/>
+
+//upperlip to Eline 
+      <HorizontalLinearMeasurement
+  p1={upperLip as Point}
+  p2={softPog as Point}
+  lineEnd={noseTip}
+  label="UL-E"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+  offsetLabel={320}
+   imgDetails={imageDimensions}
+/>
+
+//upperlip to Sline 
+      <HorizontalLinearMeasurement
+  p1={upperLip as Point}
+  p2={softPog as Point}
+  lineEnd={ntToSubnaleIntersection}
+  label="UL-S"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+  offsetLabel={390}
+  color="#ef4444"
+   imgDetails={imageDimensions}
+/>
+
+ //lowerlip to Sline 
+      <HorizontalLinearMeasurement
+  p1={lowerLip as Point}
+  p2={softPog as Point}
+  lineEnd={ntToSubnaleIntersection}
+  label="LL-S"
+  pixelsPerMm={0.264583}
+  mode="point-to-line"
+  showReferenceLine
+  color="#ef4444"
+  offsetLabel={200}
+   imgDetails={imageDimensions}
+/>
+
+//  upperlip to upperIncisor 
+     <HorizontalLinearMeasurement
+      p1={u1Tip as Point}
+      p2={upperLip as Point}
+      label="UL-U1"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+      offsetLabel={140}
+    />
+
+     //lowerlip to upperIncisor 
+     <HorizontalLinearMeasurement
+      p1={u1Tip as Point}
+      p2={lowerLip as Point}
+      label="LL-U1"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+      offsetLabel={60}
+    />
+
+   //lowerlip to lowerIncisor 
+     <HorizontalLinearMeasurement
+      p1={l1Tip as Point}
+      p2={lowerLip as Point}
+      label="LL-L1"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+      offsetLabel={100}
+    />
+
+    //upperlip to lowerIncisor 
+     <HorizontalLinearMeasurement
+      p1={l1Tip as Point}
+      p2={upperLip as Point}
+      label="UL-L1"
+      pixelsPerMm={0.264583}
+      imgDetails={imageDimensions}
+      offsetLabel={200}
+    />
+    </>
+    )
+}
+
+
 
     {/* planes */}
       {showPlanes && (
@@ -1334,6 +1460,29 @@ const InterIncisalAngleIntersection = useMemo(() => {
               );
             })()}
 
+
+            {/* //menton extension */}
+
+              {analysisSelection.hardTissue && selectedTracing.includes('GO-ME') && gonion &&
+            menton &&
+            (() => {
+              
+              // How far beyond Gonion you want the line to extend
+              const extension = 750;
+
+             
+              return (
+                <line
+                  x1={menton.renderX + extension}
+                  y1={menton.renderY}
+                  x2={menton.renderX - 350}
+                  y2={menton.renderY}
+                  stroke="#22c55e"
+                  strokeWidth={2}
+                />
+              );
+            })()}
+
           {analysisSelection.hardTissue && selectedTracing.includes('PNS-ANS') &&  ans &&
             pns &&
             (() => {
@@ -1366,16 +1515,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
               );
             })()}
 
-          {analysisSelection.hardTissue &&  l1Apex && l1Tip && (
-            <line
-              x1={l1Apex.renderX}
-              y1={l1Apex.renderY}
-              x2={l1Tip.renderX}
-              y2={l1Tip.renderY}
-              stroke="#ec4899"
-              strokeWidth={1.5}
-            />
-          )}
+        
            
            {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && softNas && (
             <line
@@ -1465,10 +1605,10 @@ const InterIncisalAngleIntersection = useMemo(() => {
             })()}
           
           {/* pogonion-upperlip */}
-          {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && upperLip &&
+          {analysisSelection.softTissue && selectedTracing.includes('NT-SPO') &&  softPog && ntToSubnaleIntersection &&
             (() => {
-              const dx = softPog.renderX - upperLip.renderX;
-              const dy = softPog.renderY - upperLip.renderY;
+              const dx = softPog.renderX - ntToSubnaleIntersection.renderX;
+              const dy = softPog.renderY - ntToSubnaleIntersection.renderY;
 
               // How far beyond nose you want the line to extend
               const extension = 750;
@@ -1482,8 +1622,8 @@ const InterIncisalAngleIntersection = useMemo(() => {
 
             
               // New endpoint beyond Orbitale
-              const extendedOX = upperLip.renderX + unitX * extensionA;
-              const extendedOY = upperLip.renderY + unitY * extensionA;
+              const extendedOX = ntToSubnaleIntersection.renderX + unitX * extensionA;
+              const extendedOY = ntToSubnaleIntersection.renderY + unitY * extensionA;
 
               return (
                 <line
@@ -1682,7 +1822,7 @@ const InterIncisalAngleIntersection = useMemo(() => {
             className="transition-all duration-150 group-hover:scale-150"
           />
 
-          <circle r={2.5} fill="#ffffff" />
+          <circle r={1} fill="#ffffff" />
 
           {showLabels && (
             <text

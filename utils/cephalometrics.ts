@@ -1,4 +1,8 @@
 import { Keypoint, CephMeasurement, CephAnalysisResult } from '@/types';
+import { useMemo } from 'react';
+import { getLineIntersection } from './helpers';
+import { Point } from './cephMath';
+import { useAppContext } from '@/providers/context-provider';
 
 /**
  * Calculate angle in degrees between three points (vertex is p2)
@@ -34,9 +38,9 @@ export function calculateLineAngle(
   const angle1 = Math.atan2(p2.y - p1.y, p2.x - p1.x);
   const angle2 = Math.atan2(p4.y - p3.y, p4.x - p3.x);
   let diff = Math.abs(angle1 - angle2) * (180 / Math.PI);
-  if (diff > 90) {
-    diff = 180 - diff;
-  }
+  // if (diff > 90) {
+  //   diff = 180 - diff;
+  // }
   return diff;
 }
 
@@ -55,23 +59,79 @@ export function findLandmark(
 /**
  * Compute real-time cephalometric values from placed keypoints
  */
-export function computeCephFromKeypoints(keypoints: Keypoint[]): Partial<CephAnalysisResult['measurements']> {
-  const sella = findLandmark(keypoints, ['sella', 's']);
-  const nasion = findLandmark(keypoints, ['nasion', 'n']);
-  const aPoint = findLandmark(keypoints, ['subspinale', 'a_point', 'a']);
-  const bPoint = findLandmark(keypoints, ['supramentale', 'b_point', 'b']);
-  const menton = findLandmark(keypoints, ['menton', 'me']);
-  const gonion = findLandmark(keypoints, ['gonion', 'go']);
-  const porion = findLandmark(keypoints, ['porion', 'po']);
-  const orbitale = findLandmark(keypoints, ['orbitale', 'or']);
-  const lowerIncTip = findLandmark(keypoints, ['lower-incisor-tip', 'lower_incisor_tip', 'l1_tip', 'is']);
-  const lowerIncApex = findLandmark(keypoints, ['lower-incisor-apex', 'lower_incisor_apex', 'l1_apex', 'ia']);
+export const ComputeCephComponents = () => {
+     const { getAngle } = useAppContext()
+  const computeCephFromKeypoints =  function computeVal(keypoints: Keypoint[]): Partial<CephAnalysisResult['measurements']> {
+
+
+   const sella = findLandmark(keypoints,["sella", "s"]);
+  const nasion = findLandmark(keypoints,["nasion", "n"]);
+  const ans = findLandmark(keypoints,["ans"]);
+  const pns = findLandmark(keypoints,["pns"]);
+  const aPoint = findLandmark(keypoints,["subspinale", "a_point", "a"]);
+  const bPoint = findLandmark(keypoints,["supramentale", "b_point", "b"]);
+  const menton = findLandmark(keypoints,["mention", "me"]);
+  const gonion = findLandmark(keypoints,["gonion", "go"]);
+  const articulare = findLandmark(keypoints,["articulae","articule","articulare", "ar"]);
+  const xgonion = findLandmark(keypoints,["xgonion"]);
+  const porion = findLandmark(keypoints,["ponion", "po"]);
+  const orbitale = findLandmark(keypoints,["orbitale", "or"]);
+  const subnasale = findLandmark(keypoints,["subnasale"]);
+  const upperLip = findLandmark(keypoints,["upper-lip", "upper_lip", "ls"]);
+  const lowerLip = findLandmark(keypoints,["lower-lip", "lower_lip", "li"]);
+  const softPog = findLandmark(keypoints,["soft-tissue-pogonion", "soft_pogonion", "pog_prime"]);
+  // new points to add to models
+  const softNas = findLandmark(keypoints,["soft-tissue-nasion", "soft_nasion", "sn"]);
+  const noseTip = findLandmark(keypoints,["nose-tip", "nose-tip", "n-t"]);
+  const glabella = findLandmark(keypoints,["glabella", "glabella", "g-l"]);
+  const ntToSubnaleIntersection = findLandmark(keypoints,['nose-tip-subnasale-intersection'])
+    
+  const u1Tip = findLandmark(keypoints,[
+    "upper-incisor-tip",
+    "upper_incisor_tip",
+    "u1_tip",
+    "is",
+  ]);
+
+  const u1Apex = findLandmark(keypoints,[
+    "upper-incisor-apex",
+    "upper_incisor_apex",
+    "u1_apex",
+    "ia",
+  ]);
+
+  const l1Tip = findLandmark(keypoints,[
+    "lower-incisor-tip",
+    "lower_incisor_tip",
+    "l1_tip",
+    "ii",
+  ]);
+
+  const l1Apex = findLandmark(keypoints,[
+    "lower-incisor-apex",
+    "lower_incisor_apex",
+    "l1_apex",
+    "ia",
+  ]);
+  
+  // const sella = findLandmark(keypoints, ['sella', 's']);
+  // const nasion = findLandmark(keypoints, ['nasion', 'n']);
+  // const aPoint = findLandmark(keypoints, ['subspinale', 'a_point', 'a']);
+  // const bPoint = findLandmark(keypoints, ['supramentale', 'b_point', 'b']);
+  // const menton = findLandmark(keypoints, ['menton', 'me']);
+  // const gonion = findLandmark(keypoints, ['gonion', 'go']);
+  // const porion = findLandmark(keypoints, ['ponion', 'po']);
+  // const orbitale = findLandmark(keypoints, ['orbitale', 'or']);
+  // const lowerIncTip = findLandmark(keypoints, ['lower-incisor-tip', 'lower_incisor_tip', 'l1_tip', 'is']);
+  // const lowerIncApex = findLandmark(keypoints, ['lower-incisor-apex', 'lower_incisor_apex', 'l1_apex', 'ia']);
 
   const measurements: any = {};
-
+ 
+  console.log('chjj',l1Apex,l1Tip)
   // SNA: S - N - A
   if (sella && nasion && aPoint) {
-    const snaVal = Number(calculateAngle(sella, nasion, aPoint).toFixed(1));
+    // const snaVal = Number(calculateAngle(sella, nasion, aPoint).toFixed(1));
+    const snaVal = getAngle('SNA')?.value || 0
     let status: 'normal' | 'low' | 'high' = 'normal';
     let interp = 'Normal maxillary position';
     if (snaVal > 84) {
@@ -134,11 +194,12 @@ export function computeCephFromKeypoints(keypoints: Keypoint[]): Partial<CephAna
     let fmaVal = 25.0;
     if (porion && orbitale) {
       fmaVal = Number(calculateLineAngle(porion, orbitale, gonion, menton).toFixed(1));
-    } else if (sella && nasion) {
-      // SN-GoMe is typically ~32° (norm 32°±3°); converted approx Tweed FMA = SN-GoMe - 7°
-      const snGoMe = calculateLineAngle(sella, nasion, gonion, menton);
-      fmaVal = Number(Math.max(14, Math.min(42, snGoMe - 7)).toFixed(1));
     }
+    // } else if (sella && nasion) {
+    //   // SN-GoMe is typically ~32° (norm 32°±3°); converted approx Tweed FMA = SN-GoMe - 7°
+    //   const snGoMe = calculateLineAngle(sella, nasion, gonion, menton);
+    //   fmaVal = Number(Math.max(14, Math.min(42, snGoMe - 7)).toFixed(1));
+    // }
     let status: 'normal' | 'low' | 'high' = 'normal';
     let interp = 'Normodivergent facial growth';
     if (fmaVal > 28) {
@@ -156,10 +217,14 @@ export function computeCephFromKeypoints(keypoints: Keypoint[]): Partial<CephAna
     };
   }
 
-  // IMPA: Incisor Mandibular Plane Angle (L1 axis to Go-Me)
-  if (gonion && menton && lowerIncTip && lowerIncApex) {
-    const l1Angle = calculateLineAngle(lowerIncApex, lowerIncTip, gonion, menton);
-    const impaVal = Number((180 - l1Angle > 120 ? 180 - l1Angle : l1Angle).toFixed(1));
+  // IMPA: Incisor Mandibular Plane Angle (L1 axis to Go-Me) //somemight not work if the keypoints were not returned
+  if (gonion && menton && l1Tip && l1Apex) {
+    
+    
+    const l1Angle = calculateLineAngle(l1Apex, l1Tip, gonion, menton);
+    console.log('line-angle', l1Angle)
+    // const impaVal = Number((180 - l1Angle > 120 ? 180 - l1Angle : l1Angle).toFixed(1));
+    const impaVal = Number((180 - l1Angle).toFixed(1))
     let status: 'normal' | 'low' | 'high' = 'normal';
     let interp = 'Normal lower incisor inclination';
     if (impaVal > 95) {
@@ -198,5 +263,34 @@ export function computeCephFromKeypoints(keypoints: Keypoint[]): Partial<CephAna
     };
   }
 
+  // IIA: Interincisal Angle (L1 axis to U1 axis) //somemight not work if the keypoints were not returned
+  if (u1Apex && u1Tip && l1Tip && l1Apex) {
+    
+    
+    const l1Angle = calculateLineAngle(l1Apex, l1Tip, u1Tip, u1Apex);
+    console.log('line-angle', l1Angle)
+    // const impaVal = Number((180 - l1Angle > 120 ? 180 - l1Angle : l1Angle).toFixed(1));
+    const impaVal = Number((180-l1Angle).toFixed(1))
+    let status: 'normal' | 'low' | 'high' = 'normal';
+    let interp = 'Normal lower incisor inclination';
+    if (impaVal > 95) {
+      status = 'high';
+      interp = 'Proclined lower incisors';
+    } else if (impaVal < 86) {
+      status = 'low';
+      interp = 'Retroclined lower incisors';
+    }
+    measurements.IIA = {
+      value: impaVal,
+      norm: '90° (± 4°)',
+      interpretation: interp,
+      status,
+    };
+  }
+
   return measurements;
 }
+
+return {computeCephFromKeypoints}
+}
+

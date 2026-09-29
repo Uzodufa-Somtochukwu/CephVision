@@ -1,35 +1,63 @@
 import { Button } from "@/elements/button";
 import { Card } from "@/elements/card";
 import { AnalysisSelection, AnalysisTab, CephAnalysisResult, CephStudy, EditableFindings, PatientInfo, PredictionObject } from "@/types";
-import { computeCephFromKeypoints } from "@/utils/cephalometrics";
+
 import { formatDateTime } from "@/utils/helpers";
 import { generateCephPdfReport } from "@/utils/pdfExport";
-import { Activity, AlertTriangle, ArrowLeft, Check, CheckCheck, CheckCircle2, Clock3, Download, Eye, EyeOff, FileText, Layers, Move, Plus, Printer, Save, Sparkles, Trash2, User, X, XCircle } from "lucide-react";
-import { ChangeEvent, useRef, useState } from "react";
+import { Activity, AlertTriangle, ArrowLeft, Check, CheckCheck, CheckCircle2, Clock3, Download, Eye, EyeOff, FileText, Layers, Move, Plus, Printer, Save, Search, Sparkles, Trash2, User, X, XCircle } from "lucide-react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { MeasurementCard } from "./measurment-card";
 import { Field } from "@/elements/field";
 import { SummaryRow } from "./summary-row";
 import { TreatmentCard } from "./treatment-card";
 import { CephLandmarks } from "./cephlandmarks";
 import { LandmarkManager } from "./landmark-manager";
-import { ANALYSIS_MODES, CEPH_LANDMARKS_KEYPOINTS } from "@/MOCK_DATA";
+import { ANALYSIS_MODES, CEPH_LANDMARKS_KEYPOINTS, mockCephAnalysisResult } from "@/MOCK_DATA";
+import { ComputeCephComponents } from "@/utils/cephalometrics";
+import useGetManualMeasurement from "@/utils/manualMeasurments";
 
 
 export function AnalysisView({
   study,
+  studies,
   onSave,
   onBack,
   onDelete,
   onNewAnalysis,
+  allPatient,
+  handleOpenStudy
 }: {
   study: CephStudy;
+  studies: CephStudy[];
   onSave: (study: CephStudy) => void;
   onBack: () => void;
   onDelete: () => void;
   onNewAnalysis: () => void;
+  allPatient: {
+    latest:CephStudy;
+    count:number
+  }[];
+handleOpenStudy: (study: CephStudy) => void
 }) {
+  const[search,setSearch] = useState<string>('')
+  const[isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [imageSrc, setImageSrc] =
     useState<string | null>(study.imageSrc);
+
+    const { computeCephFromKeypoints } = ComputeCephComponents()
+   const { getManualMeasurement } = useGetManualMeasurement();
+
+  const [manualMeasurements, setManualMeasurements] = useState<
+    Record<string, any>
+  >({});
+
+  const handleManualMeasurement = () => {
+    const result = getManualMeasurement();
+
+    setManualMeasurements(result);
+  };
+
+    console.log('manualmeas', manualMeasurements)
 
   const [landmarks, setLandmarks] =
     useState<PredictionObject[]>(
@@ -116,7 +144,38 @@ const [analysisSelection, setAnalysisSelection] =
     .map((lm) => lm.id)
 );
 
+//trigger a re-render when another pt is selected
+useEffect(() => {
+  setPatient(study.patient)
+  setLandmarks(study.landmarks)
+  setImageSrc(study.imageSrc)
+  setCustomObjectives(study.customObjectives)
+  setEditableFindings(study.editableFindings)
+  setAnalysisData(study.analysisData)
+},[study])
+
 console.log('analysisSelection', analysisSelection)
+
+ const patients = allPatient.filter(({ latest }) => {
+      const query = search.toLowerCase().trim();
+
+      if (!query) return true;
+
+      return (
+        latest.patient.name
+          ?.toLowerCase()
+          .includes(query) ||
+        latest.patient.id
+          ?.toLowerCase()
+          .includes(query)
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.latest.updatedAt).getTime() -
+        new Date(a.latest.updatedAt).getTime()
+    );
+
 
 const toggleLandmarkCategory = (category: "hard-tissue" | "soft-tissue") => {
   // Get the new selection state
@@ -296,7 +355,18 @@ const toggleLandmark = (id: string) => {
       }
 
       if (data.predictions) {
-        setLandmarks(data.predictions);
+
+        const realTimeAngles =
+        computeCephFromKeypoints(
+          data.predictions[0].keypoints
+        );
+
+          setAnalysisData( {...mockCephAnalysisResult, measurements: {
+            ...mockCephAnalysisResult.measurements,
+            ...realTimeAngles,
+          } } as any)      
+         setLandmarks(data.predictions);
+        // // handleLandmarkChange(data.predictions) //updated measurement after landmarkdetection
       }
     } catch (err: any) {
       console.error(
@@ -637,10 +707,7 @@ const toggleLandmark = (id: string) => {
                   ? ` · ${patient.sex}`
                   : ""}
               </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+               <div className="flex items-center mt-3 gap-2 text-xs text-slate-400">
             <Clock3 className="h-4 w-4" />
             {study.updatedAt
               ? `Last saved ${formatDateTime(
@@ -648,6 +715,56 @@ const toggleLandmark = (id: string) => {
                 )}`
               : "Unsaved analysis"}
           </div>
+            </div>
+          </div>
+         <section className="relative">
+          <div className="relative mt-7">
+           
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+
+          <input
+            value={search}
+            onChange={(e) =>
+            {
+              setSearch(e.target.value)
+              setIsMenuOpen(true)
+            }
+            
+              
+            }
+            
+            placeholder="Search patient name or patient ID..."
+            className="h-13 w-full rounded-xl border border-slate-200 bg-white pl-12 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#166534] focus:ring-4 focus:ring-green-100"
+          />
+        </div>
+
+        {/* patient list */}
+        <div className={`${(search.length >= 1 && patients.length >= 1 && isMenuOpen ) ? 'absolute' : 'hidden' } px-4 py-2 w-full bg-white shadow shadow=xl rounded-md`}>
+          <div className="flex flex-col gap-y-2 items-start">
+            {patients.map(({latest,count}) => (
+              <button key={latest.id} className="cursor-pointer w-full text-start" onClick={() => {
+                handleOpenStudy(latest)
+                setSearch(latest.patient.name)
+                setIsMenuOpen(false)
+              }} onKeyDown={(e) => {
+                    if (e.key === "enter") {
+                     handleOpenStudy(latest)
+                setSearch(latest.patient.name)
+                setIsMenuOpen(false)
+                    }
+                  }}>{latest.patient.name}</button>
+            ))}
+          </div>
+        </div>
+        {
+          (search.length >= 1 && patients.length < 1) && 
+          <div className=" absolute px-4 py-2 w-full bg-white shadow shadow=xl rounded-md">
+           <p>Patient Not found</p>
+          </div> 
+        }
+       
+         </section>
+          
         </div>
 
         {/* =================================================
@@ -754,7 +871,7 @@ const toggleLandmark = (id: string) => {
             NAVIGATION TABS
         ================================================= */}
 
-        <div className="mb-6 flex overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+        <div className="mb-6 flex sticky top-[4.8rem] z-50 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
           {[
             {
               id: "radiograph" as const,
@@ -783,7 +900,11 @@ const toggleLandmark = (id: string) => {
               <button
                 key={tab.id}
                 onClick={() =>
+                {
                   setActiveTab(tab.id)
+                  handleManualMeasurement()
+                 
+                }
                 }
                 className={`
                   flex cursor-pointer min-w-max flex-1 items-center justify-center gap-2
@@ -1305,21 +1426,23 @@ const toggleLandmark = (id: string) => {
               </div>
             </Card>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <h2 className="text-bold text-green-600 pb-3 font-bold ">HARD TISSUE</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <MeasurementCard
                 name="SNA"
                 fullName="Sella-Nasion-A Point"
                 value={
-                  analysisData?.measurements?.SNA
+                 manualMeasurements?.SNA
                     ?.value
                 }
                 norm="82° ± 2°"
                 interpretation={
-                  analysisData?.measurements?.SNA
+                  manualMeasurements?.SNA
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.SNA
+                  manualMeasurements.SNA
                     ?.status || "pending"
                 }
               />
@@ -1328,16 +1451,16 @@ const toggleLandmark = (id: string) => {
                 name="SNB"
                 fullName="Sella-Nasion-B Point"
                 value={
-                  analysisData?.measurements?.SNB
+                  manualMeasurements.SNB
                     ?.value
                 }
                 norm="80° ± 2°"
                 interpretation={
-                  analysisData?.measurements?.SNB
+                  manualMeasurements.SNB
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.SNB
+                  manualMeasurements.SNB
                     ?.status || "pending"
                 }
               />
@@ -1346,16 +1469,16 @@ const toggleLandmark = (id: string) => {
                 name="ANB"
                 fullName="A Point-Nasion-B Point"
                 value={
-                  analysisData?.measurements?.ANB
+                  manualMeasurements.ANB
                     ?.value
                 }
                 norm="2° ± 2°"
                 interpretation={
-                  analysisData?.measurements?.ANB
+                  manualMeasurements.ANB
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.ANB
+                  manualMeasurements.ANB
                     ?.status || "pending"
                 }
               />
@@ -1364,17 +1487,17 @@ const toggleLandmark = (id: string) => {
                 name="Wits"
                 fullName="Wits Appraisal"
                 value={
-                  analysisData?.measurements?.Wits
+                  manualMeasurements.Wits
                     ?.value
                 }
                 unit=""
                 norm="≈ 0 mm"
                 interpretation={
-                  analysisData?.measurements?.Wits
+                  manualMeasurements.Wits
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.Wits
+                  manualMeasurements.Wits
                     ?.status || "pending"
                 }
               />
@@ -1383,16 +1506,16 @@ const toggleLandmark = (id: string) => {
                 name="FMA"
                 fullName="Frankfort Mandibular Angle"
                 value={
-                  analysisData?.measurements?.FMA
+                  manualMeasurements.FMA
                     ?.value
                 }
                 norm="25° ± 3°"
                 interpretation={
-                  analysisData?.measurements?.FMA
+                  manualMeasurements.FMA
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.FMA
+                  manualMeasurements.FMA
                     ?.status || "pending"
                 }
               />
@@ -1401,19 +1524,420 @@ const toggleLandmark = (id: string) => {
                 name="IMPA"
                 fullName="Incisor Mandibular Plane Angle"
                 value={
-                  analysisData?.measurements?.IMPA
+                  manualMeasurements.IMPA
                     ?.value
                 }
                 norm="90° ± 4°"
                 interpretation={
-                  analysisData?.measurements?.IMPA
+                  manualMeasurements.IMPA
                     ?.interpretation
                 }
                 status={
-                  analysisData?.measurements?.IMPA
+                  manualMeasurements.IMPA
                     ?.status || "pending"
                 }
               />
+
+              <MeasurementCard
+                name="MMPA"
+                fullName="Maxilo-Mandibular Plane Angle"
+                value={
+                  manualMeasurements.MMPA
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.MMPA
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.MMPA
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="IIA"
+                fullName="Interincisal Angle"
+                value={
+                  manualMeasurements.IIncisal
+                    ?.value
+                }
+                norm={manualMeasurements.IIncisal?.norm}
+                interpretation={
+                  manualMeasurements.IIncisal
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.IIncisal
+                    ?.status || "pending"
+                }
+              />
+
+               <MeasurementCard
+                name="U1_SN"
+                fullName="Upper incisor - SN"
+                value={
+                  manualMeasurements.U1_SN
+                    ?.value
+                }
+                norm={manualMeasurements.U1_SN?.norm}
+                interpretation={
+                  manualMeasurements.U1_SN
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.U1_SN
+                    ?.status || "pending"
+                }
+              />
+
+               <MeasurementCard
+                name="IFPA"
+                fullName="Incisal-Franfurt Plane"
+                value={
+                  manualMeasurements.IFPA
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.IFPA
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.IFPA
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="ArA"
+                fullName="Articular Angle"
+                value={
+                  manualMeasurements.Articular
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.Articular
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.Articular
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="Saddle"
+                fullName="Saddle Angle"
+                value={
+                  manualMeasurements.Saddle
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.Saddle
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.Saddle
+                    ?.status || "pending"
+                }
+              />
+
+                <MeasurementCard
+                name="Gonial"
+                fullName="Gonial Angle"
+                value={
+                  manualMeasurements.Gonial
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.Gonial
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.Gonial
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="Upper Gonial"
+                fullName="Upper Gonial Angle"
+                value={
+                  manualMeasurements.Upper_Gonial
+                    ?.value
+                }
+                norm={manualMeasurements.Upper_Gonial?.norm}
+                interpretation={
+                  manualMeasurements.Upper_Gonial
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.Upper_Gonial
+                    ?.status || "pending"
+                }
+              />
+               <MeasurementCard
+                name="Lower Gonial"
+                fullName="Lower Gonial Angle"
+                value={
+                  manualMeasurements.Lower_Gonial
+                    ?.value
+                }
+                norm="90° ± 4°"
+                interpretation={
+                  manualMeasurements.Lower_Gonial
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements.Lower_Gonial
+                    ?.status || "pending"
+                }
+              />
+
+
+             
+            </div>
+            </div>
+
+            <div>
+               <h2 className="text-bold text-green-600 pb-3 font-bold ">SOFT TISSUES</h2>
+               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                 <MeasurementCard
+                name="Z Angle"
+                fullName="Z Angle"
+                value={
+                  manualMeasurements?.Z_Angle
+                    ?.value
+                }
+                norm={manualMeasurements?.Z_Angle?.norm}
+                interpretation={
+                   manualMeasurements?.Z_Angle
+                    ?.interpretation
+                }
+                status={
+                   manualMeasurements?.Z_Angle
+                    ?.status || "pending"
+                }
+              />
+
+               <MeasurementCard
+                name="H Angle"
+                fullName="H Angle"
+                value={
+                 manualMeasurements.H_Angle
+                    ?.value
+                }
+                norm={manualMeasurements?.H_Angle?.norm}
+                interpretation={
+                  manualMeasurements?.H_Angle
+                    ?.interpretation
+                }
+                status={
+                  manualMeasurements?.H_Angle
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="NLA"
+                fullName="Nasolabial Angle"
+                value={
+                  analysisData?.measurements?.NLA
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.NLA
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.NLA
+                    ?.status || "pending"
+                }
+              />
+
+               <MeasurementCard
+                name="TFA"
+                fullName="Total Facial Angle"
+                value={
+                  analysisData?.measurements?.TFA
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.TFA
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.TFA
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="LFH"
+                fullName="Lower Facial Height"
+                value={
+                  analysisData?.measurements?.LFH
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.LFH
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.LFH
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="UL-E"
+                fullName="Upper Lip - Eline"
+                value={
+                  analysisData?.measurements?.UL_E
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.UL_E
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.UL_E
+                    ?.status || "pending"
+                }
+              />
+                <MeasurementCard
+                name="UL-S"
+                fullName="Upper Lip - Sline"
+                value={
+                  analysisData?.measurements?.UL_S
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.UL_S
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.UL_S
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="LL-E"
+                fullName="Lower Lip - Eline"
+                value={
+                  analysisData?.measurements?.LL_E
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.LL_E
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.LL_E
+                    ?.status || "pending"
+                }
+              />
+                <MeasurementCard
+                name="LL-S"
+                fullName="Lower Lip - Sline"
+                value={
+                  analysisData?.measurements?.LL_S
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.LL_S
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.LL_S
+                    ?.status || "pending"
+                }
+              />
+
+               <MeasurementCard
+                name="LL-U1"
+                fullName="Lower Lip - Upper Incisor"
+                value={
+                  analysisData?.measurements?.LL_U1
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.LL_U1
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.LL_U1
+                    ?.status || "pending"
+                }
+              />
+              <MeasurementCard
+                name="LL-L1"
+                fullName="Lower Lip - Lower Incisor"
+                value={
+                  analysisData?.measurements?.LL_L1
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.LL_L1
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.LL_L1
+                    ?.status || "pending"
+                }
+              />
+
+              <MeasurementCard
+                name="UL-U1"
+                fullName="Upper Lip - Upper Incisor"
+                value={
+                  analysisData?.measurements?.UL_U1
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.UL_U1
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.UL_U1
+                    ?.status || "pending"
+                }
+              />
+              <MeasurementCard
+                name="UL-L1"
+                fullName="Upper Lip - Lower Incisor"
+                value={
+                  analysisData?.measurements?.UL_L1
+                    ?.value
+                }
+                norm="82° ± 2°"
+                interpretation={
+                  analysisData?.measurements?.UL_L1
+                    ?.interpretation
+                }
+                status={
+                  analysisData?.measurements?.UL_L1
+                    ?.status || "pending"
+                }
+              />
+
+               </div>
             </div>
           </div>
         )}
