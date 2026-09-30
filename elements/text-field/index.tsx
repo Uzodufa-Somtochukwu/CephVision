@@ -33,7 +33,7 @@ const TextInput = ({
   const [isDisclose, setIsDisclose] = useState(false);
   return (
     <div className="flex flex-col mt-2 mb-1">
-      {label && <label className="font-semibold mb-2">{label}</label>}
+      {label && <label className="font-semibold text-black mb-2">{label}</label>}
       <div
         className={`${
           type === "password" &&
@@ -52,7 +52,7 @@ const TextInput = ({
           type={isDisclose ? "text" : type || "text"}
           name={name}
           className={[
-            `py-2 outline-none px-2 bg-white rounded-xl ${
+            `py-2 outline-none px-2 placeholder:bg-gray-500 bg-white rounded-xl ${
               type !== "password" ||
               (name === "phoneNumber" || name === "phone_number" &&
                 `focus-within:border-2 focus-within:border-[#0A7B7B] `)

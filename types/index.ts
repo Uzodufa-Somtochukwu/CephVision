@@ -1,3 +1,36 @@
+export type AnalysisMode =
+  | "steiner"
+  | "mcnamara"
+  | "jarabak"
+  | "tweed"
+  | "wits"
+  | "soft-tissue"
+  | "comprehensive";
+
+ export type AnalysisSelection = {
+  hardTissue: boolean;
+  softTissue: boolean;
+  modes: AnalysisMode[];
+  measurements: string[];
+};
+
+export type LandmarkCategory = "hard-tissue" | "soft-tissue";
+
+export interface LandmarkDefinition {
+  id: string;
+  labels: string[];
+  abbreviation: string;
+  name: string;
+  category: LandmarkCategory;
+  description?: string;
+  requiredFor?: AnalysisMode[];
+  renderX?:number;
+  renderY?:number;
+  x?:number;
+  y?:number;
+  class?:string;
+  confidence?:number
+};
 export interface Keypoint {
   id?: string;
   class: string;

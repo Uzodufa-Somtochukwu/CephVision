@@ -88,3 +88,124 @@ export function createEmptyStudy(selectedPatientId:string = ''): CephStudy {
     updatedAt: now,
   };
 }
+
+export const calculateAngle = (
+  p1: { renderX: number ; renderY: number  },
+  vertex: { renderX: number; renderY: number },
+  p2: { renderX: number; renderY: number }
+) => {
+  const v1 = {
+    x: (p1.renderX || 0) - (vertex?.renderX || 0),
+    y: (p1.renderY || 0) - (vertex?.renderY || 0),
+  };
+
+  const v2 = {
+    x: (p2?.renderX || 0) - (vertex?.renderX ||0),
+    y: (p2?.renderY || 0) - (vertex?.renderY || 0),
+  };
+
+  const dot = v1.x * v2.x + v1.y * v2.y;
+
+  const mag1 = Math.sqrt(v1.x ** 2 + v1.y ** 2);
+  const mag2 = Math.sqrt(v2.x ** 2 + v2.y ** 2);
+
+  if (!mag1 || !mag2) return null;
+
+  const cosAngle = dot / (mag1 * mag2);
+
+  // Prevent floating-point errors
+  const clampedCos = Math.max(
+    -1,
+    Math.min(1, cosAngle)
+  );
+
+  const radians = Math.acos(clampedCos);
+
+  return (radians * 180) / Math.PI;
+};
+
+//For angles that have 
+
+export const calculateSignedAngle = (
+  p1: { renderX: number; renderY: number },
+  vertex: { renderX: number; renderY: number },
+  p2: { renderX: number; renderY: number }
+) => {
+  const v1x = p1.renderX - vertex.renderX;
+  const v1y = p1.renderY - vertex.renderY;
+
+  const v2x = p2.renderX - vertex.renderX;
+  const v2y = p2.renderY - vertex.renderY;
+
+  const cross =
+    v1x * v2y -
+    v1y * v2x;
+
+  const dot =
+    v1x * v2x +
+    v1y * v2y;
+
+  return (
+    Math.atan2(cross, dot) *
+    (180 / Math.PI)
+  );
+};
+
+
+
+export const calculateDistance = (
+  p1: Point,
+  p2: Point,
+  pixelsPerMm: number
+) => {
+  const dx = p2.renderX - p1.renderX;
+  const dy = p2.renderY - p1.renderY;
+
+  const pixelDistance = Math.hypot(dx, dy);
+
+  return pixelDistance / pixelsPerMm;
+};
+
+type Point = {
+  renderX: number;
+  renderY: number;
+};
+
+export const getLineIntersection = (
+  p1: Point,
+  p2: Point,
+  p3: Point,
+  p4: Point
+): Point | null => {
+  const x1 = p1.renderX;
+  const y1 = p1.renderY;
+
+  const x2 = p2.renderX;
+  const y2 = p2.renderY;
+
+  const x3 = p3.renderX;
+  const y3 = p3.renderY;
+
+  const x4 = p4.renderX;
+  const y4 = p4.renderY;
+
+  const denominator =
+    (x1 - x2) * (y3 - y4) -
+    (y1 - y2) * (x3 - x4);
+
+  // Parallel lines
+  if (Math.abs(denominator) < 0.000001) {
+    return null;
+  }
+
+  const t =
+    ((x1 - x3) * (y3 - y4) -
+      (y1 - y3) * (x3 - x4)) /
+    denominator;
+
+  return {
+    renderX: x1 + t * (x2 - x1),
+    renderY: y1 + t * (y2 - y1),
+  };
+};
+

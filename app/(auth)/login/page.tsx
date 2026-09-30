@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import LoginForm from "@/components/auths/loginForm";
 import { cephLoginImage } from "@/public/images";
+import useGetManualMeasurement from "@/utils/manualMeasurments";
 
 
 const LoginPage = () => {
+	
 	return (
 		<div className="min-h-screen rounded-md">
 			<div className="hidden md:flex h-[100vh] flex-row">
