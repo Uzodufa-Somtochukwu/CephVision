@@ -1,22 +1,48 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+// Layout: see services/data/paths.ts
+// Files are private to the clinician who uploaded them. Uploads get a fresh
+// ID each time, so existing files are never overwritten, and the app cannot
+// delete them (erasure requests are handled with admin tooling).
+
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // This rule allows anyone with your Storage bucket reference to view, edit,
-    // and delete all data in your Storage bucket. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Storage bucket will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Storage bucket will be denied until you Update
-    // your rules
-    match /{allPaths=**} {
-      allow read, write: if request.time < timestamp.date(2026, 9, 15);
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
     }
+
+    // Storage treats overwriting a file's contents as "create", so check
+    // explicitly that nothing exists at the path yet.
+    function isNewFile() {
+      return resource == null;
+    }
+
+    function maxSize() {
+      return request.resource.size < 20 * 1024 * 1024;
+    }
+
+    match /users/{uid}/patients/{patientId}/studies/{studyId} {
+      match /radiograph/{fileName} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && isNewFile()
+          && maxSize()
+          && request.resource.contentType.matches('image/(jpeg|png)');
+        allow update, delete: if false;
+      }
+
+      match /reports/{fileName} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && isNewFile()
+          && maxSize()
+          && request.resource.contentType == 'application/pdf'
+          && fileName.matches('.*[.]pdf');
+        allow update, delete: if false;
+      }
+    }
+
+    // Anything else is denied.
   }
 }

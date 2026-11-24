@@ -1,18 +1,106 @@
-rules_version='2'
+rules_version = '2';
+
+// Data model: see services/data/paths.ts
+// Every document lives under users/{uid}; only that signed-in clinician can reach it.
+// Clinical history is append-only: versions, AI runs, reports and audit entries
+// can be created but never changed or deleted from the app. Studies are soft-deleted.
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 9, 15);
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function unchanged(field) {
+      return incoming()[field] == resource.data[field];
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && incoming().uid == uid
+        && incoming().displayName is string;
+      allow update: if isOwner(uid)
+        && unchanged('uid')
+        && unchanged('createdAt');
+      allow delete: if false;
+
+      match /patients/{patientId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && incoming().ownerUid == uid
+          && incoming().name is string
+          && incoming().deleted == false;
+        allow update: if isOwner(uid)
+          && unchanged('ownerUid')
+          && unchanged('createdAt');
+        allow delete: if false;
+      }
+
+      match /studies/{studyId} {
+        function versionPath(n) {
+          return /databases/$(database)/documents/users/$(uid)/studies/$(studyId)/versions/$(string(n));
+        }
+
+        allow read: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && incoming().ownerUid == uid
+          && incoming().patientId is string
+          && incoming().version == 1
+          && incoming().deleted == false;
+
+        // Optimistic locking + mandatory history: each update bumps the version
+        // by one and must write a snapshot of the previous version in the same batch.
+        allow update: if isOwner(uid)
+          && unchanged('ownerUid')
+          && unchanged('patientId')
+          && unchanged('createdAt')
+          && incoming().version == resource.data.version + 1
+          && existsAfter(versionPath(resource.data.version));
+
+        allow delete: if false;
+
+        match /versions/{versionId} {
+          allow read: if isOwner(uid);
+          allow create: if isOwner(uid)
+            && incoming().ownerUid == uid
+            && incoming().snapshotAt == request.time;
+          allow update, delete: if false;
+        }
+
+        match /aiRuns/{runId} {
+          allow read: if isOwner(uid);
+          allow create: if isOwner(uid)
+            && incoming().actorUid == uid
+            && incoming().type in ['landmark-detection', 'ai-analysis']
+            && incoming().createdAt == request.time;
+          allow update, delete: if false;
+        }
+
+        match /reports/{reportId} {
+          allow read: if isOwner(uid);
+          allow create: if isOwner(uid)
+            && incoming().actorUid == uid
+            && incoming().storagePath is string
+            && incoming().createdAt == request.time;
+          allow update, delete: if false;
+        }
+      }
+
+      match /auditLog/{entryId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid)
+          && incoming().actorUid == uid
+          && incoming().action is string
+          && incoming().at == request.time;
+        allow update, delete: if false;
+      }
     }
   }
 }
