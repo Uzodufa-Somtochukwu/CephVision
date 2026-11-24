@@ -11,3 +11,12 @@ export interface SignInResI {
   token: string;
   user: any;
 }
+
+export interface ForgotPasswordI {
+  email: string;
+}
+
+export interface ResetPasswordI {
+  password: string;
+  confirm_password: string;
+}

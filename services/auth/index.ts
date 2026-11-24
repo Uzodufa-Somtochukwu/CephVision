@@ -1,8 +1,11 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  confirmPasswordReset,
+  sendPasswordResetEmail,
   signOut as firebaseSignOut,
   updateProfile,
+  verifyPasswordResetCode,
 } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { firebaseAuth } from "@/config/firebase";
@@ -26,6 +29,25 @@ export async function signUp({ username, email, password }: SignUpI) {
   return user;
 }
 
+export async function sendPasswordReset(email: string) {
+  try {
+    await sendPasswordResetEmail(firebaseAuth(), email.trim());
+  } catch (err) {
+    // Don't reveal whether an account exists for this email.
+    if (err instanceof FirebaseError && err.code === "auth/user-not-found") return;
+    throw err;
+  }
+}
+
+/** Validates the reset link's code and returns the account email. */
+export function verifyResetCode(oobCode: string) {
+  return verifyPasswordResetCode(firebaseAuth(), oobCode);
+}
+
+export function confirmReset(oobCode: string, newPassword: string) {
+  return confirmPasswordReset(firebaseAuth(), oobCode, newPassword);
+}
+
 export function signOut() {
   return firebaseSignOut(firebaseAuth());
 }
@@ -41,6 +63,10 @@ export function authErrorMessage(err: unknown): string {
       return "An account with this email already exists.";
     case "auth/weak-password":
       return "Password must be at least 6 characters.";
+    case "auth/expired-action-code":
+      return "This reset link has expired. Request a new one.";
+    case "auth/invalid-action-code":
+      return "This reset link is invalid or has already been used.";
     case "auth/invalid-email":
       return "Enter a valid email address.";
     case "auth/too-many-requests":

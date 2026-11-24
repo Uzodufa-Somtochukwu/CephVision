@@ -51,6 +51,14 @@ export const CONFIRMPASSWORDSCHEMA = yup.object().shape({
     // .oneOf([yup.ref('password')], 'Password must match'),
 })
 
+export const RESETPASSWORDSCHEMA = yup.object().shape({
+    password: yup.string().required('Password is required').min(6, 'password must be atleast 6 characters'),
+    confirm_password: yup
+        .string()
+        .required('Please confirm your password')
+        .oneOf([yup.ref('password')], 'Passwords must match'),
+})
+
 export const CHANGEPASSWORDSCHEMA = yup.object().shape({
     password: yup.string().required('New password is required').min(6, 'password must be atleast 6 characters'),
     old_password: yup.string().required('Old password is required'),

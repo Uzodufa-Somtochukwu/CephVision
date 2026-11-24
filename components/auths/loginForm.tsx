@@ -103,9 +103,9 @@ const LoginForm = () => {
             />
           </section>
           <div className="flex flex-row justify-between text-base font-normal mt-3 mb-2  text-primary">
-            {/* <Link href="/forgot-password">
-              <h3 className="text-primary underline">Forgot password?</h3>
-            </Link> */}
+            <Link href={RoutePaths.FORGOTPASSWORD}>
+              <h3 className="text-primary text-black underline">Forgot password?</h3>
+            </Link>
             <Link href="/signup">
               <h3 className="text-primary text-black underline">Signup</h3>
             </Link>
