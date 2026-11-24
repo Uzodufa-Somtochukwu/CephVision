@@ -9,6 +9,9 @@
     "lint": "eslint",
     "test:rules": "firebase emulators:exec --only firestore,storage --project demo-cephvision \"node --test tests/rules.test.mjs\""
   },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@google/genai": "^2.13.0",
     "@google/generative-ai": "^0.24.1",
