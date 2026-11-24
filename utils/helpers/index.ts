@@ -1,6 +1,7 @@
 
 
 import { CephStudy, PatientInfo } from "@/types";
+import { newId } from "@/services/data/ids";
 
 export function createId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -53,15 +54,28 @@ export function createEmptyPatient(patientID:string): PatientInfo {
   };
 }
 
-export function createEmptyStudy(selectedPatientId:string = ''): CephStudy {
+export function createEmptyStudy(
+  existingPatient?: { patientId: string; patient: PatientInfo }
+): CephStudy {
   const now = new Date().toISOString();
 
   return {
-    id: createId(),
+    id: newId(),
 
-    patient: createEmptyPatient(selectedPatientId),
+    // New patient unless we're adding an analysis for an existing one.
+    patientId: existingPatient?.patientId ?? newId(),
+
+    patient: existingPatient
+      ? {
+          ...existingPatient.patient,
+          date: new Date().toLocaleDateString(),
+          doctorName: "",
+        }
+      : createEmptyPatient(""),
 
     imageSrc: null,
+    radiograph: null,
+    clinician: null,
 
     imageDimensions: {
       width: 800,
@@ -83,6 +97,11 @@ export function createEmptyStudy(selectedPatientId:string = ''): CephStudy {
     customObjectives: [],
 
     clinicianNotes: "",
+
+    latestDetectionRunId: null,
+    latestAnalysisRunId: null,
+
+    version: 0,
 
     createdAt: now,
     updatedAt: now,

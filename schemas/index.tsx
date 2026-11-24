@@ -5,6 +5,12 @@ export const SIGNINSCHEMA = yup.object().shape({
     password: yup.string().required('password is required')
 })
 
+export const SIGNUPSCHEMA = yup.object().shape({
+    username: yup.string().trim().required('Name is required'),
+    email: yup.string().required('email is required').email('Email is not valid'),
+    password: yup.string().required('password is required').min(6, 'password must be atleast 6 characters'),
+})
+
 export const CREATESESSIONSCHEMA = yup.object().shape({
     name: yup.string().required("Session is required").matches(/^\d{4}\/\d{4}$/, 'Session must be in YYYY/YYYY Format'),
 })

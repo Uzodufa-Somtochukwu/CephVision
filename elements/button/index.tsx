@@ -5,6 +5,7 @@ export function Button({
   disabled = false,
   type = "button",
   className = "",
+  title,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
@@ -12,6 +13,8 @@ export function Button({
   disabled?: boolean;
   type?: "button" | "submit";
   className?: string;
+  /** Tooltip and accessible name, useful for icon-only buttons. */
+  title?: string;
 }) {
   const variants = {
     primary:
@@ -29,6 +32,8 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      title={title}
+      aria-label={title}
       className={`
         inline-flex cursor-pointer items-center justify-center gap-2
         rounded-xl px-4 py-2.5

@@ -7,9 +7,10 @@ import React, {
   useState,
 } from "react";
 
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
 import {
-  PredictionObject,
-  Keypoint,
   CephStudy,
   ViewMode,
 } from "@/types";
@@ -19,13 +20,19 @@ import {
 } from "lucide-react";
 
 import { createEmptyStudy } from "@/utils/helpers";
-import { Card } from "@/elements/card";
-import { loadStudies, saveStudies } from "@/utils/storage/localstorage";
+import { useAuth } from "@/providers/auth-provider";
+import { loadStudies, saveStudy, softDeleteStudy } from "@/services/data/studies";
+import { importLocalStudies, readLegacyStudies } from "@/services/data/import-local";
+import { signOut } from "@/services/auth";
+import { RoutePaths } from "@/components/route-paths";
 import { PatientList } from "@/components/dashboard/components/patient-list";
 import { PatientHistory } from "@/components/dashboard/components/patient-history";
 import { AnalysisView } from "@/components/dashboard/components/analysis-view";
 
 export default function App() {
+  const router = useRouter();
+  const { user, clinician, loading: authLoading } = useAuth();
+
   const [studies, setStudies] =
     useState<CephStudy[]>([]);
 
@@ -41,35 +48,84 @@ export default function App() {
   const [hydrated, setHydrated] =
     useState(false);
 
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
+
+  // Lazy init: localStorage is only read in the browser (server render shows the loader).
+  const [legacyCount, setLegacyCount] =
+    useState(() => readLegacyStudies().length);
+
+  const [importStatus, setImportStatus] =
+    useState<string | null>(null);
+
   /* =====================================================
-     LOAD STORAGE
+     AUTH GUARD
   ===================================================== */
 
   useEffect(() => {
-    const stored = loadStudies();
-
-    setStudies(stored);
-
-    setHydrated(true);
-  }, []);
+    if (!authLoading && !user) router.replace(RoutePaths.LOGIN);
+  }, [authLoading, user, router]);
 
   /* =====================================================
-     PERSIST
-   */
+     LOAD FROM FIRESTORE
+  ===================================================== */
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!user) return;
+    let cancelled = false;
 
-    saveStudies(studies);
-  }, [studies, hydrated]);
+    loadStudies(user.uid)
+      .then((loaded) => {
+        if (cancelled) return;
+        setStudies(loaded);
+        setLoadError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to load studies:", err);
+        if (!cancelled) {
+          setLoadError("Could not load your patients. Check your connection and reload.");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setHydrated(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  /* =====================================================
+     IMPORT STUDIES SAVED IN THIS BROWSER (old version)
+  ===================================================== */
+
+  const handleImportLocal = async () => {
+    if (!user || !clinician) return;
+    setImportStatus("Importing...");
+    try {
+      const imported = await importLocalStudies(user.uid, clinician, (done, total) =>
+        setImportStatus(`Importing ${done} of ${total}...`)
+      );
+      toast.success(`Imported ${imported.length} analyses from this browser.`);
+      setStudies(await loadStudies(user.uid));
+    } catch (err) {
+      console.error("Import failed:", err);
+      toast.error("Import stopped partway. Click import again to continue.");
+    } finally {
+      setImportStatus(null);
+      setLegacyCount(readLegacyStudies().length);
+    }
+  };
 
   /*  NEW ANALYSIS */
-  const handleAddMoreAnalysisForPatient = (patientId:string = '') => {
-      const newStudy = createEmptyStudy(patientId);
-  }
 
-  const handleNewAnalysis = (patientId:string = '') => {
-    const newStudy = createEmptyStudy(patientId);
+  // Pass a study to start a new analysis for that study's patient.
+  const handleNewAnalysis = (forPatient?: CephStudy) => {
+    const newStudy = createEmptyStudy(
+      forPatient
+        ? { patientId: forPatient.patientId, patient: forPatient.patient }
+        : undefined
+    );
     setCurrentStudy(newStudy);
     setViewMode("analysis");
     setSelectedPatientStudy(null);
@@ -77,32 +133,32 @@ export default function App() {
 
   /* SAVE */
 
-  const handleSaveStudy = (
+  const handleSaveStudy = async (
     updatedStudy: CephStudy
-  ) => {
+  ): Promise<CephStudy> => {
+    if (!user || !clinician) throw new Error("You are signed out.");
+
+    const previous = studies.find(
+      (study) => study.id === updatedStudy.id
+    );
+
+    const saved = await saveStudy(user.uid, updatedStudy, previous, clinician);
+
     setStudies((prev) => {
-      const existingIndex =
-        prev.findIndex(
-          (study) =>
-            study.id === updatedStudy.id
-        );
-
-      if (existingIndex === -1) {
-        return [
-          updatedStudy,
-          ...prev,
-        ];
-      }
-
-      const updated = [...prev];
-
-      updated[existingIndex] =
-        updatedStudy;
-
-      return updated;
+      // Patient details are shared: refresh them on the patient's other studies.
+      const synced = prev.map((study) =>
+        study.patientId === saved.patientId
+          ? { ...study, patient: { ...saved.patient, date: study.patient.date, doctorName: study.patient.doctorName } }
+          : study
+      );
+      const existingIndex = synced.findIndex((study) => study.id === saved.id);
+      if (existingIndex === -1) return [saved, ...synced];
+      synced[existingIndex] = saved;
+      return synced;
     });
 
-    setCurrentStudy(updatedStudy);
+    setCurrentStudy(saved);
+    return saved;
   };
 
   /* =====================================================
@@ -132,16 +188,25 @@ export default function App() {
     setViewMode("patients");
   };
 
-  /* DELETE */
+  /* DELETE (soft: kept in history and audit log) */
 
-  const handleDeleteStudy = () => {
-    if (!currentStudy) return;
+  const handleDeleteStudy = async () => {
+    if (!currentStudy || !user) return;
 
     const confirmed = window.confirm(
-      "Are you sure you want to delete this analysis? This cannot be undone."
+      "Delete this analysis? It will be removed from your patient list. A record is kept in the audit history."
     );
 
     if (!confirmed) return;
+
+    const saved = studies.find((study) => study.id === currentStudy.id);
+
+    try {
+      if (saved) await softDeleteStudy(user.uid, saved);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete analysis.");
+      return;
+    }
 
     setStudies((prev) =>
       prev.filter(
@@ -154,11 +219,15 @@ export default function App() {
     setViewMode("patients");
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace(RoutePaths.LOGIN);
+  };
+
   const groupedPatients = studies.reduce<
     Record<string, CephStudy[]>
   >((acc, study) => {
-    const patientId =
-      study.patient.id || study.patient.name;
+    const patientId = study.patientId;
 
     if (!acc[patientId]) {
       acc[patientId] = [];
@@ -185,7 +254,7 @@ export default function App() {
 
   /* LOADING  */
 
-  if (!hydrated) {
+  if (authLoading || !user || !hydrated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7faf8]">
         <div className="text-center">
@@ -215,7 +284,7 @@ export default function App() {
           setSelectedPatientStudy(null)
         }
         onOpenStudy={handleOpenStudy}
-        onNewAnalysis={(patientId:string) => handleNewAnalysis(patientId)}
+        onNewAnalysis={handleNewAnalysis}
       />
     );
   }
@@ -230,10 +299,16 @@ export default function App() {
       <PatientList
         studies={studies}
         allPatient = {patients}
-        onNewAnalysis={handleNewAnalysis}
+        onNewAnalysis={() => handleNewAnalysis()}
         onOpenPatient={
           handleOpenPatient
         }
+        onSignOut={handleSignOut}
+        clinicianName={clinician?.name ?? ""}
+        loadError={loadError}
+        legacyCount={legacyCount}
+        importStatus={importStatus}
+        onImportLocal={handleImportLocal}
       />
     );
   }
@@ -253,7 +328,7 @@ export default function App() {
         }}
         handleOpenStudy ={handleOpenPatienStudy}
         onDelete={handleDeleteStudy}
-        onNewAnalysis={ handleNewAnalysis}
+        onNewAnalysis={handleNewAnalysis}
       />
     );
   }

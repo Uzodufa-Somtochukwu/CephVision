@@ -1,12 +1,10 @@
-
-
-
 import { useFormik } from "formik";
-import { SignInI, SignUpI } from "@/types/auth";
-import { SIGNINSCHEMA } from "@/schemas";
-import { useSignIn } from "@/services/auth"; 
+import { SignUpI } from "@/types/auth";
+import { SIGNUPSCHEMA } from "@/schemas";
 import { toast } from "react-toastify";
-import { storeCookie } from "@/utils/storage";
+import { useEffect, useState } from "react";
+import { authErrorMessage, signUp } from "@/services/auth";
+import { useAuth } from "@/providers/auth-provider";
 // import { useDispatch} from "react-redux";
 // import { getUser } from "@/redux/slices/auth";
 
@@ -19,12 +17,18 @@ import Image from "next/image";
 
 const SignupForm = () => {
   const navigate = useRouter();
-//   const dispatch = useDispatch();
-  const signinMutation = useSignIn();
+  //   const dispatch = useDispatch();
+  const { user, loading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+
+  // Already signed in: go straight to the dashboard.
+  useEffect(() => {
+    if (!loading && user) navigate.replace(RoutePaths.DASHBOARD);
+  }, [user, loading, navigate]);
 
   //initial form value
   const initialValues: SignUpI = {
-    username:"",
+    username: "",
     email: "",
     password: "",
   };
@@ -32,94 +36,92 @@ const SignupForm = () => {
   const { handleSubmit, handleChange, values, errors, touched } =
     useFormik<SignUpI>({
       initialValues,
-      validationSchema: SIGNINSCHEMA,
-      onSubmit: () => {
-        // signinMutation.mutate(values, {
-        //   onSuccess: (data) => {
-        //     toast.success(data.message);
-        //     navigate.push(RoutePaths.DASHBOARD);
-        //     storeCookie({ key: "AUTH_TOKEN", value: data.token });
-        //     dispatch(getUser(data.user)); 
-        //   },
-        //   onError: (error) => {
-        //     toast.error(error.message);
-        //   },
-        // });
+      validationSchema: SIGNUPSCHEMA,
+      onSubmit: async (formValues) => {
+        setSubmitting(true);
+        try {
+          await signUp(formValues);
+          toast.success("Account created.");
+          navigate.replace(RoutePaths.DASHBOARD);
+        } catch (err) {
+          toast.error(authErrorMessage(err));
+        } finally {
+          setSubmitting(false);
+        }
       },
     });
 
   return (
     <main className="w-full ">
       <div className="grid w-full gap-x-5 min-h-screen ">
-        
-        
-
         {/* right content */}
         <form
           onSubmit={handleSubmit}
           className="px-6 py-6 w-full flex flex-col justify-center md:h-screen"
         >
           <div className="bg-white p-4 rounded-xl border shadow-[grey] shadow-sm w-full">
-          <section>
-            <div className="flex flex-row gap-x-2 items-center -ml-2">
-              <Image src={cephLoginImage} alt="logo"  className="rounded-full h-10 w-10"  />
-              <h2 className="text-black font-bold text-2xl">
-                CephVision
-              </h2>
-            </div>
-          </section>
+            <section>
+              <div className="flex flex-row gap-x-2 items-center -ml-2">
+                <Image
+                  src={cephLoginImage}
+                  alt="logo"
+                  className="rounded-full h-10 w-10"
+                />
+                <h2 className="text-black font-bold text-2xl">CephVision</h2>
+              </div>
+            </section>
 
-          
-          {/* <h1 className="text-xl font-bold mt-16 ">Register for an awesome experience </h1> */}
-          <section className="mt-7">
-            <TextInput
-              value={values.username}
-              label="Username"
-              onChange={handleChange}
-              err={!!errors.username && touched.username}
-              errMessage={errors.username}
-              type="text"
-              name="username"
-              placeHolder="Enter username"
-              className="w-full border "
-            />
-          </section>
-          <section className="mt-5">
-            <TextInput
-              value={values.email}
-              label="Email"
-              onChange={handleChange}
-              err={!!errors.email && touched.email}
-              errMessage={errors.email}
-              type="text"
-              name="email"
-              placeHolder="Enter email"
-              className="w-full border "
-            />
-          </section>
-          <section className="">
-            <TextInput
-              value={values.password}
-              label="Password"
-              onChange={handleChange}
-              err={!!errors.password && touched.password}
-              errMessage={errors.password}
-              type="password"
-              name="password"
-              placeHolder="***********"
-              className="w-full border/"
-            />
-          </section>
-          <div className="flex flex-row justify-between text-base font-normal mt-3 mb-2  text-primary">
-            {/* <Link href="/forgot-password">
+            {/* <h1 className="text-xl font-bold mt-16 ">Register for an awesome experience </h1> */}
+            <section className="mt-7">
+              <TextInput
+                value={values.username}
+                label="Full name (shown on reports)"
+                onChange={handleChange}
+                err={!!errors.username && touched.username}
+                errMessage={errors.username}
+                type="text"
+                name="username"
+                placeHolder="Dr. Jane Doe"
+                className="w-full border "
+              />
+            </section>
+            <section className="mt-5">
+              <TextInput
+                value={values.email}
+                label="Email"
+                onChange={handleChange}
+                err={!!errors.email && touched.email}
+                errMessage={errors.email}
+                type="text"
+                name="email"
+                placeHolder="Enter email"
+                className="w-full border "
+              />
+            </section>
+            <section className="">
+              <TextInput
+                value={values.password}
+                label="Password"
+                onChange={handleChange}
+                err={!!errors.password && touched.password}
+                errMessage={errors.password}
+                type="password"
+                name="password"
+                placeHolder="***********"
+                className="w-full border/"
+                props={{ autoComplete: "new-password" }}
+              />
+            </section>
+            <div className="flex flex-row justify-between text-base font-normal mt-3 mb-2  text-primary">
+              {/* <Link href="/forgot-password">
               <h3 className="text-primary underline">Forgot password?</h3>
             </Link> */}
-            <Link href="/login">
-              <h3 className="text-black underline">Login</h3>
-            </Link>
-          </div>
-          <div>
-            {/* <button
+              <Link href="/login">
+                <h3 className="text-black underline">Login</h3>
+              </Link>
+            </div>
+            <div>
+              {/* <button
               type="submit"
               className={`bg-primary w-full cursor-pointer py-3 rounded-[10px] text-white font-bold ${
                 signinMutation.isPending && "cursor-not-allowed"
@@ -130,11 +132,14 @@ const SignupForm = () => {
                 ? "Logging in..."
                 : "Sign In"}
             </button> */}
-            <button className={`bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold `}>
-                SignUp
-            </button>
-            
-          </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? "Creating account..." : "Sign Up"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

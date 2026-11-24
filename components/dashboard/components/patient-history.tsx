@@ -14,24 +14,23 @@ export function PatientHistory({
   studies: CephStudy[];
   onBack: () => void;
   onOpenStudy: (study: CephStudy) => void;
-  onNewAnalysis: (val:string) => void | any;
+  onNewAnalysis: (forPatient: CephStudy) => void;
 }) {
   const patientStudies = studies
     .filter(
       (item) =>
-        item.patient.id === study.patient.id
+        item.patientId === study.patientId
     )
     .sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() -
         new Date(a.updatedAt).getTime()
     );
-    const patientID = patientStudies[0].patient.id
 
   return (
     <div className="min-h-screen bg-[#f7faf8]">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-5 lg:px-8">
           <Button
             variant="ghost"
             onClick={onBack}
@@ -40,14 +39,14 @@ export function PatientHistory({
             Patients
           </Button>
 
-          {/* <Button onClick={onNewAnalysis(patientID as string)}>
+          <Button onClick={() => onNewAnalysis(patientStudies[0] ?? study)}>
             <Plus className="h-4 w-4" />
             New Analysis
-          </Button> */}
+          </Button>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-5 sm:py-8 lg:px-8">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
             <div className="flex items-center gap-4">
