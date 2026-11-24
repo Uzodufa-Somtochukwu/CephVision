@@ -4,9 +4,10 @@
 import { useFormik } from "formik";
 import { SignInI } from "@/types/auth";
 import { SIGNINSCHEMA } from "@/schemas";
-import { useSignIn } from "@/services/auth"; 
 import { toast } from "react-toastify";
-import { storeCookie } from "@/utils/storage";
+import { useEffect, useState } from "react";
+import { authErrorMessage, signIn } from "@/services/auth";
+import { useAuth } from "@/providers/auth-provider";
 // import { useDispatch} from "react-redux";
 // import { getUser } from "@/redux/slices/auth";
 
@@ -20,7 +21,13 @@ import Image from "next/image";
 const LoginForm = () => {
   const navigate = useRouter();
 //   const dispatch = useDispatch();
-  const signinMutation = useSignIn();
+  const { user, loading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+
+  // Already signed in: go straight to the dashboard.
+  useEffect(() => {
+    if (!loading && user) navigate.replace(RoutePaths.DASHBOARD);
+  }, [user, loading, navigate]);
 
   //initial form value
   const initialValues: SignInI = {
@@ -32,18 +39,17 @@ const LoginForm = () => {
     useFormik<SignInI>({
       initialValues,
       validationSchema: SIGNINSCHEMA,
-      onSubmit: () => {
-        // signinMutation.mutate(values, {
-        //   onSuccess: (data) => {
-        //     toast.success(data.message);
-        //     navigate.push(RoutePaths.DASHBOARD);
-        //     storeCookie({ key: "AUTH_TOKEN", value: data.token });
-        //     dispatch(getUser(data.user)); 
-        //   },
-        //   onError: (error) => {
-        //     toast.error(error.message);
-        //   },
-        // });
+      onSubmit: async (formValues) => {
+        setSubmitting(true);
+        try {
+          await signIn(formValues);
+          toast.success("Welcome back!");
+          navigate.replace(RoutePaths.DASHBOARD);
+        } catch (err) {
+          toast.error(authErrorMessage(err));
+        } finally {
+          setSubmitting(false);
+        }
       },
     });
 
@@ -116,8 +122,12 @@ const LoginForm = () => {
                 ? "Logging in..."
                 : "Sign In"}
             </button> */}
-            <button onClick={() => navigate.push('/dashboard')} className={`bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold `}>
-                Login
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? "Logging in..." : "Login"}
             </button>
             
           </div>

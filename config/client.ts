@@ -1,7 +1,7 @@
 import $http from 'axios'
 import { toast } from 'react-toastify'
 import { BASE_URL } from './index'
-import { clearItem, deleteStorageCookie, getAuthToken } from '@/utils/storage'
+import { firebaseAuth } from './firebase'
 
 export { BASE_URL } from './index'
 
@@ -27,11 +27,10 @@ client.interceptors.response.use(
             //     })
             // }
             if([401,307].includes(status)){
-                 // Clear the expired token and reject the promise
-                 deleteStorageCookie({key:'AUTH_TOKEN'})
-                 clearItem()
+                 // Session no longer valid: sign out of Firebase
+                 await firebaseAuth().signOut()
                  toast.error('Login session expired , please login again')
-                 window.location.href = '/'
+                 window.location.href = '/login'
                  return await Promise.reject({
                     status,
                     message:'Login sesion expired, please login again'
@@ -43,14 +42,15 @@ client.interceptors.response.use(
 )
 
 // Set up request interceptor
-client.interceptors.request.use((config) => {
- const token = getAuthToken()  
+client.interceptors.request.use(async (config) => {
+ // Firebase ID token (refreshed automatically by the SDK)
+ const token = await firebaseAuth().currentUser?.getIdToken()
  const unAuthenticatedRoutes = [
     '/',
   ] 
   const pattern = unAuthenticatedRoutes.join('|')
   const regex = new RegExp(`^/(?:${pattern})(?:/|$)`)
-  if (!regex.test(config.url as string)) {
+  if (token && !regex.test(config.url as string)) {
     // Set the authorization header
     config.headers.Authorization = `Bearer ${token as string}`
   }
@@ -60,7 +60,7 @@ client.interceptors.request.use((config) => {
 export default client
 
 // Get the authorization header
-export const setAuthorization = () => ({
-    Authorization : `Bearer ${getAuthToken() as string}`
+export const setAuthorization = async () => ({
+    Authorization : `Bearer ${(await firebaseAuth().currentUser?.getIdToken()) ?? ''}`
 })
 

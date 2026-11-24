@@ -42,3 +42,5 @@ next-env.d.ts
 .agents
 
 firebase-debug.log
+firestore-debug.log
+!.env.example

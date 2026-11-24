@@ -160,3 +160,16 @@ export type AnalysisTab =
   | "measurements"
   | "findings"
   | "treatment";
+
+export interface ClinicianRef {
+  uid: string;
+  name: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  createdAt: string;
+  updatedAt: string;
+}

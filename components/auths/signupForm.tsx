@@ -2,11 +2,12 @@
 
 
 import { useFormik } from "formik";
-import { SignInI, SignUpI } from "@/types/auth";
-import { SIGNINSCHEMA } from "@/schemas";
-import { useSignIn } from "@/services/auth"; 
+import { SignUpI } from "@/types/auth";
+import { SIGNUPSCHEMA } from "@/schemas";
 import { toast } from "react-toastify";
-import { storeCookie } from "@/utils/storage";
+import { useEffect, useState } from "react";
+import { authErrorMessage, signUp } from "@/services/auth";
+import { useAuth } from "@/providers/auth-provider";
 // import { useDispatch} from "react-redux";
 // import { getUser } from "@/redux/slices/auth";
 
@@ -20,7 +21,13 @@ import Image from "next/image";
 const SignupForm = () => {
   const navigate = useRouter();
 //   const dispatch = useDispatch();
-  const signinMutation = useSignIn();
+  const { user, loading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+
+  // Already signed in: go straight to the dashboard.
+  useEffect(() => {
+    if (!loading && user) navigate.replace(RoutePaths.DASHBOARD);
+  }, [user, loading, navigate]);
 
   //initial form value
   const initialValues: SignUpI = {
@@ -32,19 +39,18 @@ const SignupForm = () => {
   const { handleSubmit, handleChange, values, errors, touched } =
     useFormik<SignUpI>({
       initialValues,
-      validationSchema: SIGNINSCHEMA,
-      onSubmit: () => {
-        // signinMutation.mutate(values, {
-        //   onSuccess: (data) => {
-        //     toast.success(data.message);
-        //     navigate.push(RoutePaths.DASHBOARD);
-        //     storeCookie({ key: "AUTH_TOKEN", value: data.token });
-        //     dispatch(getUser(data.user)); 
-        //   },
-        //   onError: (error) => {
-        //     toast.error(error.message);
-        //   },
-        // });
+      validationSchema: SIGNUPSCHEMA,
+      onSubmit: async (formValues) => {
+        setSubmitting(true);
+        try {
+          await signUp(formValues);
+          toast.success("Account created.");
+          navigate.replace(RoutePaths.DASHBOARD);
+        } catch (err) {
+          toast.error(authErrorMessage(err));
+        } finally {
+          setSubmitting(false);
+        }
       },
     });
 
@@ -74,13 +80,13 @@ const SignupForm = () => {
           <section className="mt-7">
             <TextInput
               value={values.username}
-              label="Username"
+              label="Full name (shown on reports)"
               onChange={handleChange}
               err={!!errors.username && touched.username}
               errMessage={errors.username}
               type="text"
               name="username"
-              placeHolder="Enter username"
+              placeHolder="Dr. Jane Doe"
               className="w-full border "
             />
           </section>
@@ -130,8 +136,12 @@ const SignupForm = () => {
                 ? "Logging in..."
                 : "Sign In"}
             </button> */}
-            <button className={`bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold `}>
-                SignUp
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-green-950 w-full cursor-pointer py-3 rounded-[10px] text-white font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? "Creating account..." : "Sign Up"}
             </button>
             
           </div>
