@@ -747,7 +747,7 @@ const toggleLandmark = (id: string) => {
       ================================================= */}
 
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:px-8">
+        <div className="mx-auto flex min-h-14 max-w-7xl items-center justify-between gap-2 px-4 sm:min-h-16 sm:gap-4 sm:px-5 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={onBack}
@@ -826,7 +826,7 @@ const toggleLandmark = (id: string) => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-5 sm:px-5 sm:py-6 lg:px-8">
         {/* =================================================
             PATIENT HEADER
         ================================================= */}
