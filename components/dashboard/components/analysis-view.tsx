@@ -1,6 +1,6 @@
 import { Button } from "@/elements/button";
 import { Card } from "@/elements/card";
-import { AnalysisSelection, AnalysisTab, CephAnalysisResult, CephStudy, EditableFindings, PatientInfo, PredictionObject } from "@/types";
+import { AnalysisSelection, AnalysisTab, CephAnalysisResult, CephStudy, EditableFindings, PatientInfo, PredictionObject, RadiographRef } from "@/types";
 
 import { formatDateTime } from "@/utils/helpers";
 import { generateCephPdfReport } from "@/utils/pdfExport";
@@ -15,6 +15,11 @@ import { LandmarkManager } from "./landmark-manager";
 import { ANALYSIS_MODES, CEPH_LANDMARKS_KEYPOINTS, mockCephAnalysisResult } from "@/MOCK_DATA";
 import { ComputeCephComponents } from "@/utils/cephalometrics";
 import useGetManualMeasurement from "@/utils/manualMeasurments";
+import { useAuth } from "@/providers/auth-provider";
+import { getPrivateFileUrl, planRadiographUpload, validateRadiograph } from "@/services/data/storage";
+import { uploadRadiograph } from "@/services/data/radiographs";
+import { recordAiRun } from "@/services/data/ai-runs";
+import { saveReport } from "@/services/data/reports";
 
 
 export function AnalysisView({
@@ -29,9 +34,9 @@ export function AnalysisView({
 }: {
   study: CephStudy;
   studies: CephStudy[];
-  onSave: (study: CephStudy) => void;
+  onSave: (study: CephStudy) => Promise<CephStudy>;
   onBack: () => void;
-  onDelete: () => void;
+  onDelete: () => void | Promise<void>;
   onNewAnalysis: () => void;
   allPatient: {
     latest:CephStudy;
@@ -39,10 +44,32 @@ export function AnalysisView({
   }[];
 handleOpenStudy: (study: CephStudy) => void
 }) {
+  const { user, clinician } = useAuth();
   const[search,setSearch] = useState<string>('')
   const[isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [imageSrc, setImageSrc] =
     useState<string | null>(study.imageSrc);
+
+  const [radiograph, setRadiograph] =
+    useState<RadiographRef | null>(study.radiograph);
+
+  const [latestDetectionRunId, setLatestDetectionRunId] =
+    useState<string | null>(study.latestDetectionRunId);
+
+  const [latestAnalysisRunId, setLatestAnalysisRunId] =
+    useState<string | null>(study.latestAnalysisRunId);
+
+  const [saving, setSaving] = useState(false);
+
+  // In-flight radiograph upload; saving waits for it.
+  const pendingUploadRef = useRef<Promise<RadiographRef | null> | null>(null);
+
+  // Lets async callbacks check the user hasn't switched to another study.
+  const studyIdRef = useRef(study.id);
+  useEffect(() => {
+    if (studyIdRef.current !== study.id) pendingUploadRef.current = null;
+    studyIdRef.current = study.id;
+  }, [study.id]);
 
     const { computeCephFromKeypoints } = ComputeCephComponents()
    const { getManualMeasurement } = useGetManualMeasurement();
@@ -149,9 +176,35 @@ useEffect(() => {
   setPatient(study.patient)
   setLandmarks(study.landmarks)
   setImageSrc(study.imageSrc)
+  setRadiograph(study.radiograph)
+  setLatestDetectionRunId(study.latestDetectionRunId)
+  setLatestAnalysisRunId(study.latestAnalysisRunId)
   setCustomObjectives(study.customObjectives)
   setEditableFindings(study.editableFindings)
   setAnalysisData(study.analysisData)
+  setClinicianNotes(study.clinicianNotes || "")
+  setSelectedMalocclusion(study.selectedMalocclusion || "Class II")
+  if (study.imageDimensions) setImgDims(study.imageDimensions)
+},[study])
+
+// Saved studies only store the Storage path: fetch the private image.
+useEffect(() => {
+  const path = study.radiograph?.storagePath;
+  if (study.imageSrc || !path) return;
+
+  let cancelled = false;
+  getPrivateFileUrl(path)
+    .then((url) => {
+      if (!cancelled) setImageSrc(url);
+    })
+    .catch((err) => {
+      console.error("Failed to load radiograph:", err);
+      if (!cancelled) setError("Could not load the saved radiograph.");
+    });
+
+  return () => {
+    cancelled = true;
+  };
 },[study])
 
 console.log('analysisSelection', analysisSelection)
@@ -234,6 +287,12 @@ const toggleLandmark = (id: string) => {
 
       imageSrc,
 
+      radiograph,
+
+      latestDetectionRunId,
+
+      latestAnalysisRunId,
+
       imageDimensions: imgDims,
 
       landmarks,
@@ -252,15 +311,41 @@ const toggleLandmark = (id: string) => {
     };
   };
 
-  const handleSave = () => {
+  // Persists the study; returns the saved copy, or null if it couldn't be saved.
+  const persistStudy = async (): Promise<CephStudy | null> => {
     if (!patient.name.trim()) {
       alert("Please enter the patient's full name.");
-      return;
+      return null;
     }
 
-    const current = buildCurrentStudy();
+    setSaving(true);
+    setError(null);
 
-    onSave(current);
+    try {
+      // Don't save a study pointing at a file that hasn't finished uploading.
+      let currentRadiograph = radiograph;
+      if (pendingUploadRef.current) {
+        currentRadiograph = await pendingUploadRef.current;
+      }
+
+      return await onSave({
+        ...buildCurrentStudy(),
+        radiograph: currentRadiograph,
+      });
+    } catch (err) {
+      console.error("Save failed:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to save analysis."
+      );
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSave = async () => {
+    const saved = await persistStudy();
+    if (!saved) return;
 
     setSavedMessage("Analysis saved successfully.");
 
@@ -277,10 +362,38 @@ const toggleLandmark = (id: string) => {
     e: ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file
 
-    if (!file) return;
+    if (!file || !user) return;
+
+    const invalid = validateRadiograph(file);
+    if (invalid) {
+      setError(invalid);
+      return;
+    }
 
     setError(null);
+
+    // Upload the original to Cloud Storage in the background.
+    const uploadStudyId = study.id;
+    const planned = planRadiographUpload(user.uid, study.patientId, study.id, file);
+    setRadiograph(null);
+    const upload = uploadRadiograph(user.uid, study.patientId, study.id, file, planned)
+      .then((ref) => {
+        if (studyIdRef.current === uploadStudyId) setRadiograph(ref);
+        return ref;
+      })
+      .catch((err) => {
+        console.error("Radiograph upload failed:", err);
+        if (studyIdRef.current === uploadStudyId) {
+          setError("The radiograph could not be uploaded. Please choose it again.");
+        }
+        return null;
+      })
+      .finally(() => {
+        if (pendingUploadRef.current === upload) pendingUploadRef.current = null;
+      });
+    pendingUploadRef.current = upload;
 
     const reader = new FileReader();
 
@@ -298,7 +411,7 @@ const toggleLandmark = (id: string) => {
 
       setActiveTab("radiograph");
 
-      runDetection(result);
+      runDetection(result, planned.storagePath);
     };
 
     reader.readAsDataURL(file);
@@ -324,7 +437,8 @@ const toggleLandmark = (id: string) => {
   ===================================================== */
 
   const runDetection = async (
-    base64Image: string
+    base64Image: string,
+    radiographPath: string | null = radiograph?.storagePath ?? null
   ) => {
     setLoading(true);
     setError(null);
@@ -355,6 +469,22 @@ const toggleLandmark = (id: string) => {
       }
 
       if (data.predictions) {
+        if (user) {
+          // Keep the untouched model output, separate from clinician edits.
+          const run = recordAiRun(user.uid, study.id, study.patientId, {
+            type: "landmark-detection",
+            provider: "roboflow",
+            model: data.model ?? "unknown",
+            radiographPath,
+            imageDimensions: imgDims,
+            output: data.predictions,
+            rawJson: data.raw ? JSON.stringify(data.raw) : null,
+          });
+          setLatestDetectionRunId(run.id);
+          run.written.catch((err) =>
+            console.error("Failed to record detection run:", err)
+          );
+        }
 
         const realTimeAngles =
         computeCephFromKeypoints(
@@ -425,6 +555,22 @@ const toggleLandmark = (id: string) => {
       }
 
       if (data.measurements) {
+        if (user) {
+          const run = recordAiRun(user.uid, study.id, study.patientId, {
+            type: "ai-analysis",
+            provider: "gemini",
+            model: data.metadata?.model ?? "unknown",
+            radiographPath: radiograph?.storagePath ?? null,
+            imageDimensions: imgDims,
+            output: JSON.parse(JSON.stringify(data)),
+            rawJson: null,
+          });
+          setLatestAnalysisRunId(run.id);
+          run.written.catch((err) =>
+            console.error("Failed to record AI analysis run:", err)
+          );
+        }
+
         setAnalysisData(data);
 
         setEditableFindings({
@@ -534,13 +680,17 @@ const toggleLandmark = (id: string) => {
       return;
     }
 
+    // A report must match a stored version of the study.
+    const saved = await persistStudy();
+    if (!saved || !user) return;
+
     setPdfGenerating(true);
     setPdfStatus(
       "Initializing PDF report..."
     );
 
     try {
-      await generateCephPdfReport({
+      const report = await generateCephPdfReport({
         patient,
         analysisData,
         activeMalocclusion:
@@ -553,6 +703,9 @@ const toggleLandmark = (id: string) => {
         onProgress: (status) =>
           setPdfStatus(status),
       });
+
+      setPdfStatus("Saving a copy to the patient record...");
+      await saveReport(user.uid, saved, report.blob, report.fileName);
     } catch (err) {
       console.error(
         "PDF generation failed:",
@@ -560,7 +713,7 @@ const toggleLandmark = (id: string) => {
       );
 
       alert(
-        "Failed to generate PDF report."
+        "Failed to generate or store the PDF report."
       );
     } finally {
       setPdfGenerating(false);
@@ -633,11 +786,11 @@ const toggleLandmark = (id: string) => {
             <Button
               variant="secondary"
               onClick={handleSave}
-              disabled={!patient.name.trim()}
+              disabled={!patient.name.trim() || saving}
             >
               <Save className="h-4 w-4 text-[#166534]" />
               <span className="hidden sm:inline">
-                Save
+                {saving ? "Saving..." : "Save"}
               </span>
             </Button>
 
@@ -853,17 +1006,15 @@ const toggleLandmark = (id: string) => {
               </select>
             </div>
 
-            <Field
-              label="Clinician"
-              value={patient.doctorName}
-              onChange={(value:string) =>
-                setPatient({
-                  ...patient,
-                  doctorName: value,
-                })
-              }
-              placeholder="Dr. Name"
-            />
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                Clinician
+              </label>
+
+              <div className="flex h-11 w-full items-center rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700">
+                {study.clinician?.name || clinician?.name || "—"}
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -1385,7 +1536,8 @@ const toggleLandmark = (id: string) => {
                   <SummaryRow
                     label="Clinician"
                     value={
-                      patient.doctorName ||
+                      study.clinician?.name ||
+                      clinician?.name ||
                       "Not recorded"
                     }
                   />
@@ -2351,7 +2503,7 @@ const toggleLandmark = (id: string) => {
 
               <Button
                 onClick={handleSave}
-                disabled={!patient.name.trim()}
+                disabled={!patient.name.trim() || saving}
               >
                 <Save className="h-4 w-4" />
                 Save Analysis

@@ -22,7 +22,7 @@ export async function generateCephPdfReport({
   customNotes: string;
   cephContainerElement?: HTMLElement | null;
   onProgress?: (status: string) => void;
-}): Promise<void> {
+}): Promise<{ blob: Blob; fileName: string }> {
   try {
     if (onProgress) onProgress("Preparing report document...");
 
@@ -442,6 +442,9 @@ export async function generateCephPdfReport({
     pdf.save(fileName);
 
     if (onProgress) onProgress("Complete");
+
+    // Returned so the caller can keep a copy of exactly what was handed out.
+    return { blob: pdf.output("blob"), fileName };
   } catch (error) {
     console.error("PDF generation error:", error);
     throw error;

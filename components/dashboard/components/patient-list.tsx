@@ -1,7 +1,7 @@
 import { Button } from "@/elements/button";
 import { CephStudy } from "@/types";
 import { formatDate } from "@/utils/helpers";
-import { Activity, ChevronRight, Plus, Search, User, Users } from "lucide-react";
+import { Activity, AlertTriangle, ChevronRight, LogOut, Plus, Search, Upload, User, Users } from "lucide-react";
 import { useState } from "react";
 
 export function PatientList({
@@ -9,6 +9,12 @@ export function PatientList({
   studies,
   onNewAnalysis,
   onOpenPatient,
+  onSignOut,
+  clinicianName,
+  loadError,
+  legacyCount,
+  importStatus,
+  onImportLocal,
 }: {
   studies: CephStudy[];
   allPatient: {
@@ -17,6 +23,13 @@ export function PatientList({
   }[]
   onNewAnalysis: () => void;
   onOpenPatient: (study: CephStudy) => void;
+  onSignOut: () => void;
+  clinicianName: string;
+  loadError: string | null;
+  /** Analyses still stored only in this browser (pre-Firebase version). */
+  legacyCount: number;
+  importStatus: string | null;
+  onImportLocal: () => void;
 }) {
   const [search, setSearch] = useState("");
 
@@ -61,14 +74,53 @@ export function PatientList({
             </div>
           </div>
 
-          <Button onClick={onNewAnalysis}>
-            <Plus className="h-4 w-4" />
-            New Analysis
-          </Button>
+          <div className="flex items-center gap-2">
+            {clinicianName && (
+              <span className="hidden text-sm text-slate-500 md:inline">
+                {clinicianName}
+              </span>
+            )}
+
+            <Button onClick={onNewAnalysis}>
+              <Plus className="h-4 w-4" />
+              New Analysis
+            </Button>
+
+            <Button variant="ghost" onClick={onSignOut}>
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign out</span>
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
+        {loadError && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <AlertTriangle className="h-5 w-5 shrink-0" />
+            {loadError}
+          </div>
+        )}
+
+        {legacyCount > 0 && (
+          <div className="mb-6 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center">
+            <p className="text-sm text-amber-900">
+              {legacyCount} {legacyCount === 1 ? "analysis is" : "analyses are"} saved
+              only in this browser. Import them into your account so they are
+              backed up and available on other devices.
+            </p>
+
+            <Button
+              variant="secondary"
+              onClick={onImportLocal}
+              disabled={!!importStatus}
+            >
+              <Upload className="h-4 w-4" />
+              {importStatus ?? "Import"}
+            </Button>
+          </div>
+        )}
+
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="text-sm font-medium text-[#166534]">
@@ -151,7 +203,7 @@ export function PatientList({
 
               {patients.map(({ latest, count }) => (
                 <button
-                  key={latest.patient.id}
+                  key={latest.patientId}
                   onClick={() =>
                     onOpenPatient(latest)
                   }

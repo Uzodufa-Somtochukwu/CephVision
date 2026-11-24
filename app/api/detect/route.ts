@@ -50,7 +50,7 @@ normalizedPredictions = [{ keypoints }];
 }
 }
 
-return NextResponse.json({ predictions: normalizedPredictions, raw: data });
+return NextResponse.json({ predictions: normalizedPredictions, raw: data, model: modelEndpoint });
 } catch (error: any) {
 return NextResponse.json({ error: error.message }, { status: 500 });
 }

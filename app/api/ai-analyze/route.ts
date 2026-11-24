@@ -898,6 +898,8 @@ const getGeminiClient = () => {
    POST
 ============================================================ */
 
+const GEMINI_MODEL = "gemini-3.6-flash";
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -1217,7 +1219,7 @@ the supplied response schema.
 
     const geminiResponse =
       await gemini.models.generateContent({
-        model: "gemini-3.6-flash",
+        model: GEMINI_MODEL,
 
         contents: [
           {
@@ -1281,6 +1283,8 @@ the supplied response schema.
         analysis.treatmentPlans,
 
       metadata: {
+        model: GEMINI_MODEL,
+
         landmarkCount:
           keypoints.length,
 

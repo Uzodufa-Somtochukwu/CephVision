@@ -14,19 +14,18 @@ export function PatientHistory({
   studies: CephStudy[];
   onBack: () => void;
   onOpenStudy: (study: CephStudy) => void;
-  onNewAnalysis: (val:string) => void | any;
+  onNewAnalysis: (forPatient: CephStudy) => void;
 }) {
   const patientStudies = studies
     .filter(
       (item) =>
-        item.patient.id === study.patient.id
+        item.patientId === study.patientId
     )
     .sort(
       (a, b) =>
         new Date(b.updatedAt).getTime() -
         new Date(a.updatedAt).getTime()
     );
-    const patientID = patientStudies[0].patient.id
 
   return (
     <div className="min-h-screen bg-[#f7faf8]">
@@ -40,10 +39,10 @@ export function PatientHistory({
             Patients
           </Button>
 
-          {/* <Button onClick={onNewAnalysis(patientID as string)}>
+          <Button onClick={() => onNewAnalysis(patientStudies[0] ?? study)}>
             <Plus className="h-4 w-4" />
             New Analysis
-          </Button> */}
+          </Button>
         </div>
       </header>
 
