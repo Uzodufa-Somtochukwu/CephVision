@@ -328,7 +328,7 @@ export default function App() {
         }}
         handleOpenStudy ={handleOpenPatienStudy}
         onDelete={handleDeleteStudy}
-        onNewAnalysis={() => handleNewAnalysis()}
+        onNewAnalysis={handleNewAnalysis}
       />
     );
   }

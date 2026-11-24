@@ -37,7 +37,7 @@ export function AnalysisView({
   onSave: (study: CephStudy) => Promise<CephStudy>;
   onBack: () => void;
   onDelete: () => void | Promise<void>;
-  onNewAnalysis: () => void;
+  onNewAnalysis: (forPatient?: CephStudy) => void;
   allPatient: {
     latest:CephStudy;
     count:number
@@ -118,6 +118,11 @@ handleOpenStudy: (study: CephStudy) => void
   const [patient, setPatient] =
     useState<PatientInfo>(study.patient);
 
+  // The patient record this study belongs to. Starts as the study's own patient
+  // but can be re-pointed at an existing patient when a duplicate is found.
+  const [linkedPatientId, setLinkedPatientId] =
+    useState<string>(study.patientId);
+
   const [analysisData, setAnalysisData] =
     useState<CephAnalysisResult | null>(
       study.analysisData
@@ -174,6 +179,7 @@ const [analysisSelection, setAnalysisSelection] =
 //trigger a re-render when another pt is selected
 useEffect(() => {
   setPatient(study.patient)
+  setLinkedPatientId(study.patientId)
   setLandmarks(study.landmarks)
   setImageSrc(study.imageSrc)
   setRadiograph(study.radiograph)
@@ -230,6 +236,31 @@ console.log('analysisSelection', analysisSelection)
     );
 
 
+// A different saved patient with the same patient ID (blocks saving) or the
+// same name (warning only). Only checked for studies that were never saved.
+const isUnsavedStudy = !study.version;
+const normalise = (v?: string) => (v ?? "").trim().toLowerCase();
+const idMatch = isUnsavedStudy && normalise(patient.id)
+  ? allPatient.find(
+      ({ latest }) =>
+        latest.patientId !== linkedPatientId &&
+        normalise(latest.patient.id) === normalise(patient.id)
+    )?.latest
+  : undefined;
+const nameMatch = isUnsavedStudy && !idMatch && normalise(patient.name)
+  ? allPatient.find(
+      ({ latest }) =>
+        latest.patientId !== linkedPatientId &&
+        normalise(latest.patient.name) === normalise(patient.name)
+    )?.latest
+  : undefined;
+const duplicate = idMatch ?? nameMatch;
+
+const linkExistingPatient = (existing: CephStudy) => {
+  setLinkedPatientId(existing.patientId);
+  setPatient({ ...existing.patient, date: patient.date, doctorName: patient.doctorName });
+};
+
 const toggleLandmarkCategory = (category: "hard-tissue" | "soft-tissue") => {
   // Get the new selection state
   const newAnalysisSelection = {
@@ -283,6 +314,8 @@ const toggleLandmark = (id: string) => {
     return {
       ...study,
 
+      patientId: linkedPatientId,
+
       patient,
 
       imageSrc,
@@ -315,6 +348,13 @@ const toggleLandmark = (id: string) => {
   const persistStudy = async (): Promise<CephStudy | null> => {
     if (!patient.name.trim()) {
       alert("Please enter the patient's full name.");
+      return null;
+    }
+
+    if (idMatch) {
+      alert(
+        `Patient ID ${patient.id.trim()} already belongs to ${idMatch.patient.name}. Use the existing patient or enter a different ID.`
+      );
       return null;
     }
 
@@ -376,9 +416,9 @@ const toggleLandmark = (id: string) => {
 
     // Upload the original to Cloud Storage in the background.
     const uploadStudyId = study.id;
-    const planned = planRadiographUpload(user.uid, study.patientId, study.id, file);
+    const planned = planRadiographUpload(user.uid, linkedPatientId, study.id, file);
     setRadiograph(null);
-    const upload = uploadRadiograph(user.uid, study.patientId, study.id, file, planned)
+    const upload = uploadRadiograph(user.uid, linkedPatientId, study.id, file, planned)
       .then((ref) => {
         if (studyIdRef.current === uploadStudyId) setRadiograph(ref);
         return ref;
@@ -471,7 +511,7 @@ const toggleLandmark = (id: string) => {
       if (data.predictions) {
         if (user) {
           // Keep the untouched model output, separate from clinician edits.
-          const run = recordAiRun(user.uid, study.id, study.patientId, {
+          const run = recordAiRun(user.uid, study.id, linkedPatientId, {
             type: "landmark-detection",
             provider: "roboflow",
             model: data.model ?? "unknown",
@@ -556,7 +596,7 @@ const toggleLandmark = (id: string) => {
 
       if (data.measurements) {
         if (user) {
-          const run = recordAiRun(user.uid, study.id, study.patientId, {
+          const run = recordAiRun(user.uid, study.id, linkedPatientId, {
             type: "ai-analysis",
             provider: "gemini",
             model: data.metadata?.model ?? "unknown",
@@ -816,11 +856,12 @@ const toggleLandmark = (id: string) => {
 
             <Button
               variant="secondary"
-              onClick={onNewAnalysis}
+              onClick={() => onNewAnalysis(study.version ? study : undefined)}
+              title={study.version ? "Start a new analysis for this patient" : "Start a new patient"}
               className="hidden md:inline-flex"
             >
               <Plus className="h-4 w-4" />
-              New
+              {study.version ? "New analysis" : "New"}
             </Button>
           </div>
         </div>
@@ -870,7 +911,8 @@ const toggleLandmark = (id: string) => {
           </div>
             </div>
           </div>
-         <section className="relative">
+         {study.version > 0 && (
+<section className="relative">
           <div className="relative mt-7">
            
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
@@ -895,17 +937,34 @@ const toggleLandmark = (id: string) => {
         <div className={`${(search.length >= 1 && patients.length >= 1 && isMenuOpen ) ? 'absolute' : 'hidden' } px-4 py-2 w-full bg-white shadow shadow=xl rounded-md`}>
           <div className="flex flex-col gap-y-2 items-start">
             {patients.map(({latest,count}) => (
-              <button key={latest.id} className="cursor-pointer w-full text-start" onClick={() => {
-                handleOpenStudy(latest)
-                setSearch(latest.patient.name)
-                setIsMenuOpen(false)
-              }} onKeyDown={(e) => {
-                    if (e.key === "enter") {
-                     handleOpenStudy(latest)
-                setSearch(latest.patient.name)
-                setIsMenuOpen(false)
-                    }
-                  }}>{latest.patient.name}</button>
+              <div key={latest.id} className="flex w-full items-center justify-between gap-3">
+                <button
+                  type="button"
+                  className="min-w-0 flex-1 cursor-pointer text-start"
+                  onClick={() => {
+                    handleOpenStudy(latest)
+                    setSearch(latest.patient.name)
+                    setIsMenuOpen(false)
+                  }}
+                  title="Open latest analysis"
+                >
+                  <span className="block truncate text-sm font-semibold text-slate-900">{latest.patient.name}</span>
+                  <span className="block truncate text-xs text-slate-500">
+                    {latest.patient.id || "No patient ID"} · {count} {count === 1 ? "analysis" : "analyses"}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="shrink-0 cursor-pointer rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-[#166534] transition hover:bg-green-50"
+                  onClick={() => {
+                    onNewAnalysis(latest)
+                    setSearch("")
+                    setIsMenuOpen(false)
+                  }}
+                >
+                  New analysis
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -917,6 +976,7 @@ const toggleLandmark = (id: string) => {
         }
        
          </section>
+)}
           
         </div>
 
@@ -936,6 +996,19 @@ const toggleLandmark = (id: string) => {
               </h3>
             </div>
           </div>
+
+          {duplicate && (
+            <div className="mb-4 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-amber-900">
+                {idMatch
+                  ? `Patient ID ${duplicate.patient.id} already belongs to ${duplicate.patient.name}.`
+                  : `A patient named ${duplicate.patient.name} (${duplicate.patient.id || "no ID"}) already exists.`}
+              </p>
+              <Button variant="secondary" onClick={() => linkExistingPatient(duplicate)}>
+                Use existing patient
+              </Button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <Field
